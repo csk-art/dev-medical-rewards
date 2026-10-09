@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEV MEDICAL STORE Rewards</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f4f8;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 450px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px #ccc;
+}
+h1 { color: #087443; text-align: center; }
+input, button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  font-size: 16px;
+}
+input { border: 1px solid #ccc; }
+button {
+  background: #087443;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+.points {
+  background: #e0f5e8;
+  padding: 15px;
+  text-align: center;
+  border-radius: 10px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>DEV MEDICAL STORE</h1>
+<p style="text-align:center">Customer Reward Points</p>
+
+<label>Customer Name</label>
+<input id="name" placeholder="ग्राहक का नाम">
+
+<label>Mobile Number</label>
+<input id="mobile" placeholder="10 अंकों का मोबाइल नंबर"
+       inputmode="numeric" maxlength="10">
+
+<label>Purchase Amount (₹)</label>
+<input id="amount" type="number" min="0" placeholder="खरीदारी की राशि">
+
+<button onclick="addPoints()">Add Purchase & Points</button>
+
+<div class="points">
+<h3>Available Points</h3>
+<h1 id="points">0</h1>
+<p>100 पॉइंट = ₹10 का रिवॉर्ड</p>
+</div>
+
+<label>Redeem Points</label>
+<input id="redeem" type="number" min="0" placeholder="कितने पॉइंट इस्तेमाल करने हैं">
+<button onclick="redeemPoints()">Redeem Points</button>
+
+<p id="message"></p>
+</div>
+
+<script>
+function getCustomers() {
+  return JSON.parse(localStorage.getItem("devCustomers") || "{}");
+}
+
+function saveCustomers(data) {
+  localStorage.setItem("devCustomers", JSON.stringify(data));
+}
+
+function addPoints() {
+  const name = document.getElementById("name").value.trim();
+  const mobile = document.getElementById("mobile").value.trim();
+  const amount = Number(document.getElementById("amount").value);
+
+  if (!name || !/^\d{10}$/.test(mobile) ||
+      !Number.isFinite(amount) || amount <= 0) {
+    alert("नाम, सही 10 अंकों का मोबाइल नंबर और खरीदारी की राशि भरें।");
+    return;
+  }
+
+  const customers = getCustomers();
+  if (!customers[mobile]) customers[mobile] = {name, points: 0};
+
+  customers[mobile].name = name;
+  const earned = Math.floor(amount / 100);
+  customers[mobile].points += earned;
+
+  saveCustomers(customers);
+  document.getElementById("points").textContent = customers[mobile].points;
+  document.getElementById("message").textContent =
+    "खरीदारी दर्ज हुई। " + earned + " पॉइंट जोड़े गए।";
+}
+
+function redeemPoints() {
+  const mobile = document.getElementById("mobile").value.trim();
+  const redeem = Number(document.getElementById("redeem").value);
+  const customers = getCustomers();
+  const customer = customers[mobile];
+
+  if (!customer || !Number.isInteger(redeem) || redeem <= 0 ||
+      redeem > customer.points || redeem % 100 !== 0) {
+    alert("ग्राहक के उपलब्ध पॉइंट जाँचें। रिडीम राशि 100 के गुणक में होनी चाहिए।");
+    return;
+  }
+
+  customer.points -= redeem;
+  saveCustomers(customers);
+  document.getElementById("points").textContent = customer.points;
+  document.getElementById("message").textContent =
+    redeem + " पॉइंट इस्तेमाल हुए। छूट का मूल्य ₹" + (redeem / 10);
+}
+</script>
+</body>
+</html>
