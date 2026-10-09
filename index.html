@@ -6,444 +6,485 @@
 <title>DEV MEDICAL STORE Rewards</title>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f0f4f8;
-  margin: 0;
-  padding: 15px;
+*{box-sizing:border-box}
+body{
+ margin:0;padding:15px;
+ font-family:Arial,sans-serif;
+ background:#eef4f8;color:#222
 }
-.container {
-  max-width: 450px;
-  margin: 20px auto;
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 2px 10px #ccc;
+.container{
+ max-width:520px;margin:auto;background:white;
+ padding:18px;border-radius:16px;
+ box-shadow:0 3px 12px #0002
 }
-h1 {
-  color: #087443;
-  text-align: center;
+h1{text-align:center;color:#087443;font-size:25px}
+h3{color:#087443;margin-top:24px}
+label{display:block;margin-top:12px;font-weight:bold}
+input,button{
+ width:100%;padding:12px;margin-top:6px;
+ border-radius:8px;font-size:16px
 }
-input, button {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 8px;
-  font-size: 16px;
+input{border:1px solid #ccc}
+button{
+ border:0;background:#087443;color:white;
+ font-weight:bold;cursor:pointer
 }
-input {
-  border: 1px solid #ccc;
+.blue{background:#2366bd}
+.orange{background:#e67e22}
+.red{background:#c0392b}
+.profile{
+ background:#e8f7ee;padding:15px;
+ border-radius:12px;text-align:center
 }
-button {
-  background: #087443;
-  color: white;
-  border: none;
-  font-weight: bold;
+.photo{
+ width:125px;height:125px;border-radius:50%;
+ object-fit:cover;border:3px solid #087443;
+ background:white
 }
-.secondary {
-  background: #555;
+.points{font-size:27px;font-weight:bold;color:#087443}
+.small{font-size:13px;color:#666;line-height:1.5}
+.record{
+ padding:12px;border-bottom:1px solid #ddd;
+ overflow-wrap:anywhere
 }
-.points {
-  background: #e0f5e8;
-  padding: 15px;
-  text-align: center;
-  border-radius: 10px;
-  margin: 15px 0;
+.customer-row{
+ display:flex;align-items:center;gap:12px;
+ padding:10px;border-bottom:1px solid #ddd
 }
-.hidden {
-  display: none;
+.customer-row img{
+ width:55px;height:55px;border-radius:50%;
+ object-fit:cover;background:#eee
 }
-#message {
-  overflow-wrap: anywhere;
+.customer-row button{width:auto;padding:8px}
+#message{
+ margin-top:15px;padding:12px;border-radius:8px;
+ white-space:pre-line
 }
+.hidden{display:none}
 </style>
 </head>
 
 <body>
-
 <div class="container">
-  <h1>DEV MEDICAL STORE</h1>
-  <p style="text-align:center">Customer Reward Points</p>
 
-  <section id="loginSection">
-    <h3>Shopkeeper Login</h3>
+<h1>DEV MEDICAL STORE</h1>
+<p style="text-align:center">Customer Rewards Program 🎁</p>
 
-    <label>Email</label>
-    <input id="email" type="email"
-           placeholder="दुकानदार का Email">
-
-    <label>Password</label>
-    <input id="password" type="password"
-           placeholder="Password">
-
-    <button id="loginBtn">Login</button>
-    <p id="loginMessage"></p>
-  </section>
-
-  <section id="appSection" class="hidden">
-
-    <p>Login सफल हुआ।</p>
-    <button id="logoutBtn" class="secondary">Logout</button>
-
-    <hr>
-
-    <label>Customer Mobile Number</label>
-    <input id="mobile" inputmode="numeric"
-           maxlength="10" placeholder="10 अंकों का मोबाइल नंबर">
-
-    <button id="searchBtn" class="secondary">
-      Search Customer
-    </button>
-
-    <label>Customer Name</label>
-    <input id="name" placeholder="ग्राहक का नाम">
-
-    <label>Purchase Amount (₹)</label>
-    <input id="amount" type="number"
-           min="1" placeholder="खरीदारी की राशि">
-
-    <button id="addBtn">Add Purchase & Points</button>
-
-    <div class="points">
-      <h3>Available Points</h3>
-      <h1 id="points">0</h1>
-      <p>100 पॉइंट = ₹10 का रिवॉर्ड</p>
-    </div>
-
-    <label>Redeem Points</label>
-    <input id="redeem" type="number"
-           min="100" step="100"
-           placeholder="100, 200, 300...">
-
-    <button id="redeemBtn">Redeem Points</button>
-
-    <h3>Purchase History</h3>
-    <div id="history">ग्राहक खोजने पर रिकॉर्ड दिखेगा।</div>
-
-    <p id="message" aria-live="polite"></p>
-  </section>
+<div class="profile">
+ <img id="profilePhoto" class="photo"
+ src="https://placehold.co/125x125?text=Photo"
+ alt="ग्राहक की फोटो">
+ <div class="points" id="totalPoints">0 पॉइंट</div>
+ <p id="discountValue">उपलब्ध छूट: ₹0</p>
+ <p class="small" id="profileSummary">ग्राहक चुनें या नया ग्राहक जोड़ें।</p>
 </div>
 
-<script type="module">
-import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+<h3>👤 ग्राहक की जानकारी</h3>
 
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+<label>ग्राहक का नाम</label>
+<input id="name" placeholder="ग्राहक का पूरा नाम">
 
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  orderBy,
-  runTransaction,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+<label>मोबाइल नंबर</label>
+<input id="mobile" type="tel" inputmode="numeric"
+ maxlength="10" placeholder="10 अंकों का मोबाइल नंबर">
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDSaB6azxPF0fXPmTaeXx_1MCWoeGIJPf0",
-  authDomain: "dev-medical-rewards.firebaseapp.com",
-  projectId: "dev-medical-rewards",
-  storageBucket: "dev-medical-rewards.firebasestorage.app",
-  messagingSenderId: "309364119063",
-  appId: "1:309364119063:web:9a110096720368b599ee52",
-  measurementId: "G-ZHY42CNC1W"
-};
+<label>ग्राहक की फोटो — कैमरा या गैलरी</label>
+<input id="photoInput" type="file"
+ accept="image/*" capture="environment">
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+<p class="small">
+कैमरे से फोटो खींचें या गैलरी से फोटो चुनें।
+</p>
 
-const $ = id => document.getElementById(id);
+<button onclick="saveCustomer()">ग्राहक सेव करें</button>
 
-let currentCustomer = null;
-let busy = false;
+<h3>🔎 ग्राहक खोजें</h3>
+<input id="search" type="tel" inputmode="numeric"
+ maxlength="10" placeholder="मोबाइल नंबर डालें">
+<button class="blue" onclick="searchCustomer()">ग्राहक खोजें</button>
 
-function message(text) {
-  $("message").textContent = text;
+<div id="customerList"></div>
+
+<h3>🛒 खरीदारी पर पॉइंट</h3>
+<label>खरीदारी की राशि ₹</label>
+<input id="purchase" type="number" min="0"
+ step="0.01" placeholder="जैसे 500">
+
+<button onclick="addPurchase()">खरीदारी के पॉइंट जोड़ें</button>
+<p class="small">नियम: हर ₹100 की खरीदारी पर 1 पॉइंट।</p>
+
+<h3>➕ अतिरिक्त पॉइंट</h3>
+<label>पॉइंट की संख्या</label>
+<input id="manual" type="number" min="1"
+ step="1" placeholder="जैसे 20">
+<button class="blue" onclick="addManual()">अतिरिक्त पॉइंट जोड़ें</button>
+
+<h3>🎁 पॉइंट रिडीम करें</h3>
+<label>रिडीम पॉइंट</label>
+<input id="redeemAmount" type="number" min="100"
+ step="100" placeholder="जैसे 100">
+<button class="orange" onclick="redeem()">पॉइंट रिडीम करें</button>
+<p class="small">100 पॉइंट = ₹10 की छूट। नकद भुगतान नहीं मिलेगा।</p>
+
+<h3>⏰ रिडीम की अंतिम तारीख</h3>
+<label>तारीख और समय</label>
+<input id="expiry" type="datetime-local">
+<button class="blue" onclick="saveExpiry()">समय-सीमा सेव करें</button>
+<p id="expiryStatus" class="small"></p>
+
+<h3>📜 लेन-देन का इतिहास</h3>
+<div id="history">ग्राहक चुनने पर इतिहास दिखाई देगा।</div>
+
+<h3>💾 डेटा बैकअप</h3>
+<button class="blue" onclick="exportBackup()">बैकअप डाउनलोड करें</button>
+<label>बैकअप फाइल से डेटा वापस लाएँ</label>
+<input id="backupInput" type="file" accept=".json,application/json">
+<button class="blue" onclick="importBackup()">बैकअप इम्पोर्ट करें</button>
+<p class="small">
+जरूरी: डेटा इसी ब्राउज़र में सेव होता है। ब्राउज़र का डेटा साफ करने या मोबाइल बदलने पर डेटा खो सकता है। नियमित बैकअप रखें।
+</p>
+
+<div id="message"></div>
+
+</div>
+
+<script>
+const DATA_KEY = "devMedicalRewards_v2";
+const EXPIRY_KEY = "devMedicalRewardsExpiry_v2";
+
+let customers = {};
+let activeMobile = "";
+let selectedPhoto = "";
+
+function loadData(){
+ try{
+  customers = JSON.parse(localStorage.getItem(DATA_KEY) || "{}");
+ }catch(e){
+  customers = {};
+ }
+}
+loadData();
+
+function saveData(){
+ localStorage.setItem(DATA_KEY, JSON.stringify(customers));
 }
 
-function setBusy(value) {
-  busy = value;
-  ["loginBtn", "searchBtn", "addBtn",
-   "redeemBtn", "logoutBtn"].forEach(id => {
-    $(id).disabled = value;
-  });
+function msg(text, ok=true){
+ const el=document.getElementById("message");
+ el.textContent=text;
+ el.style.background=ok?"#e8f7ee":"#fdecea";
+ el.style.color=ok?"#087443":"#b42318";
 }
 
-function validMobile() {
-  return /^\d{10}$/.test($("mobile").value.trim());
+function validMobile(value){
+ return /^[0-9]{10}$/.test(value);
 }
 
-function customerRef(mobile) {
-  return doc(db, "customers", mobile);
+function customerFromForm(){
+ const name=document.getElementById("name").value.trim();
+ const mobile=document.getElementById("mobile").value.trim();
+
+ if(!name){
+  msg("ग्राहक का नाम भरें।",false);
+  return null;
+ }
+ if(!validMobile(mobile)){
+  msg("सही 10 अंकों का मोबाइल नंबर भरें।",false);
+  return null;
+ }
+
+ if(!customers[mobile]){
+  customers[mobile]={
+   name:name,photo:"",points:0,history:[]
+  };
+ }
+ const c=customers[mobile];
+ c.name=name;
+ c.history=c.history||[];
+ return {mobile,c};
 }
 
-function showCustomer(data) {
-  currentCustomer = data;
-  $("name").value = data.name || "";
-  $("points").textContent = data.points || 0;
+function addHistory(c,text){
+ c.history=c.history||[];
+ c.history.unshift({
+  text:text,
+  date:new Date().toLocaleString("en-IN")
+ });
 }
 
-async function searchCustomer() {
-  if (!validMobile()) {
-    message("सही 10 अंकों का मोबाइल नंबर भरें।");
-    return;
-  }
+document.getElementById("photoInput").addEventListener("change",function(){
+ const file=this.files[0];
+ if(!file)return;
 
-  setBusy(true);
+ if(!file.type.startsWith("image/")){
+  msg("कृपया फोटो फाइल चुनें।",false);
+  return;
+ }
 
-  try {
-    const mobile = $("mobile").value.trim();
-    const snap = await getDoc(customerRef(mobile));
+ if(file.size>5*1024*1024){
+  msg("फोटो 5 MB से छोटी चुनें।",false);
+  this.value="";
+  return;
+ }
 
-    if (!snap.exists()) {
-      currentCustomer = null;
-      $("name").value = "";
-      $("points").textContent = "0";
-      $("history").textContent = "नया ग्राहक।";
-      message("ग्राहक नहीं मिला। नाम भरकर खरीदारी दर्ज कर सकते हैं।");
-      return;
-    }
-
-    showCustomer(snap.data());
-    await loadHistory(mobile);
-    message("ग्राहक का रिकॉर्ड मिल गया।");
-  } catch (error) {
-    console.error(error);
-    message("डेटा नहीं मिला। Login और Database Rules जाँचें।");
-  } finally {
-    setBusy(false);
-  }
-}
-
-async function loadHistory(mobile) {
-  const list = $("history");
-  list.textContent = "रिकॉर्ड लोड हो रहा है...";
-
-  const historyQuery = query(
-    collection(db, "customers", mobile, "transactions"),
-    orderBy("createdAt", "desc")
-  );
-
-  const result = await getDocs(historyQuery);
-  list.replaceChildren();
-
-  if (result.empty) {
-    list.textContent = "अभी कोई खरीदारी दर्ज नहीं है।";
-    return;
-  }
-
-  result.forEach(item => {
-    const t = item.data();
-    const row = document.createElement("p");
-
-    const date = t.createdAt?.toDate
-      ? t.createdAt.toDate().toLocaleString("hi-IN")
-      : "अभी-अभी";
-
-    row.textContent =
-      date + " — " + t.type +
-      (t.amount != null ? " — ₹" + t.amount : "") +
-      " — " + (t.pointsChange > 0 ? "+" : "") +
-      t.pointsChange + " पॉइंट";
-
-    list.appendChild(row);
-  });
-}
-
-async function addPurchase() {
-  if (!validMobile()) {
-    message("पहले सही मोबाइल नंबर भरें।");
-    return;
-  }
-
-  const mobile = $("mobile").value.trim();
-  const name = $("name").value.trim();
-  const amount = Number($("amount").value);
-
-  if (!name || !Number.isFinite(amount) || amount <= 0) {
-    message("ग्राहक का नाम और सही खरीदारी राशि भरें।");
-    return;
-  }
-
-  const earned = Math.floor(amount / 100);
-
-  if (earned < 1) {
-    message("पॉइंट पाने के लिए खरीदारी कम से कम ₹100 होनी चाहिए।");
-    return;
-  }
-
-  if (!confirm(
-    "खरीदारी ₹" + amount + " दर्ज करें और " +
-    earned + " पॉइंट जोड़ें?"
-  )) return;
-
-  setBusy(true);
-
-  try {
-    const ref = customerRef(mobile);
-
-    await runTransaction(db, async transaction => {
-      const snap = await transaction.get(ref);
-      const old = snap.exists() ? snap.data() : {};
-
-      transaction.set(ref, {
-        name,
-        mobile,
-        points: (old.points || 0) + earned,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-
-      const historyRef = doc(
-        collection(db, "customers", mobile, "transactions")
-      );
-
-      transaction.set(historyRef, {
-        type: "Purchase",
-        amount,
-        pointsChange: earned,
-        createdAt: serverTimestamp()
-      });
-    });
-
-    $("amount").value = "";
-    await searchCustomer();
-    message(earned + " पॉइंट सफलतापूर्वक जुड़ गए।");
-  } catch (error) {
-    console.error(error);
-    message("खरीदारी सेव नहीं हुई। Database Rules जाँचें।");
-  } finally {
-    setBusy(false);
-  }
-}
-
-async function redeemPoints() {
-  if (!validMobile()) {
-    message("पहले ग्राहक का मोबाइल नंबर भरें।");
-    return;
-  }
-
-  const mobile = $("mobile").value.trim();
-  const redeem = Number($("redeem").value);
-
-  if (!Number.isInteger(redeem) || redeem < 100 ||
-      redeem % 100 !== 0) {
-    message("रिडीम पॉइंट 100 के गुणक में होने चाहिए।");
-    return;
-  }
-
-  if (!confirm(
-    redeem + " पॉइंट रिडीम करें? छूट का मूल्य ₹" +
-    (redeem / 10) + " होगा।"
-  )) return;
-
-  setBusy(true);
-
-  try {
-    const ref = customerRef(mobile);
-
-    await runTransaction(db, async transaction => {
-      const snap = await transaction.get(ref);
-
-      if (!snap.exists()) {
-        throw new Error("CUSTOMER_NOT_FOUND");
-      }
-
-      const customer = snap.data();
-      const balance = customer.points || 0;
-
-      if (redeem > balance) {
-        throw new Error("INSUFFICIENT_POINTS");
-      }
-
-      transaction.update(ref, {
-        points: balance - redeem,
-        updatedAt: serverTimestamp()
-      });
-
-      const historyRef = doc(
-        collection(db, "customers", mobile, "transactions")
-      );
-
-      transaction.set(historyRef, {
-        type: "Redeem",
-        amount: redeem / 10,
-        pointsChange: -redeem,
-        createdAt: serverTimestamp()
-      });
-    });
-
-    $("redeem").value = "";
-    await searchCustomer();
-    message(redeem + " पॉइंट रिडीम हुए। छूट ₹" + redeem / 10);
-  } catch (error) {
-    console.error(error);
-
-    if (error.message === "CUSTOMER_NOT_FOUND") {
-      message("ग्राहक का रिकॉर्ड नहीं मिला।");
-    } else if (error.message === "INSUFFICIENT_POINTS") {
-      message("ग्राहक के पास पर्याप्त पॉइंट नहीं हैं।");
-    } else {
-      message("रिडीम नहीं हुआ। Database Rules जाँचें।");
-    }
-  } finally {
-    setBusy(false);
-  }
-}
-
-$("loginBtn").addEventListener("click", async () => {
-  setBusy(true);
-  $("loginMessage").textContent = "";
-
-  try {
-    await signInWithEmailAndPassword(
-      auth,
-      $("email").value.trim(),
-      $("password").value
-    );
-    $("password").value = "";
-  } catch (error) {
-    console.error(error);
-    $("loginMessage").textContent =
-      "Login नहीं हुआ। Email और Password जाँचें।";
-  } finally {
-    setBusy(false);
-  }
+ const reader=new FileReader();
+ reader.onload=function(e){
+  const img=new Image();
+  img.onload=function(){
+   const canvas=document.createElement("canvas");
+   const max=400;
+   const scale=Math.min(1,max/Math.max(img.width,img.height));
+   canvas.width=Math.round(img.width*scale);
+   canvas.height=Math.round(img.height*scale);
+   canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+   selectedPhoto=canvas.toDataURL("image/jpeg",0.75);
+   document.getElementById("profilePhoto").src=selectedPhoto;
+  };
+  img.onerror=function(){msg("फोटो पढ़ी नहीं जा सकी।",false);};
+  img.src=e.target.result;
+ };
+ reader.readAsDataURL(file);
 });
 
-$("logoutBtn").addEventListener("click", async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    message("Logout नहीं हुआ। दोबारा कोशिश करें।");
+function saveCustomer(){
+ const result=customerFromForm();
+ if(!result)return;
+
+ const {mobile,c}=result;
+ if(selectedPhoto)c.photo=selectedPhoto;
+
+ saveData();
+ activeMobile=mobile;
+ render();
+ msg("ग्राहक की जानकारी सेव हो गई।");
+}
+
+function searchCustomer(){
+ const mobile=document.getElementById("search").value.trim();
+
+ if(!validMobile(mobile)){
+  msg("सही 10 अंकों का मोबाइल नंबर डालें।",false);
+  return;
+ }
+
+ const c=customers[mobile];
+ if(!c){
+  msg("यह ग्राहक नहीं मिला। नाम भरकर नया ग्राहक सेव कर सकते हैं।",false);
+  document.getElementById("mobile").value=mobile;
+  return;
+ }
+
+ activeMobile=mobile;
+ document.getElementById("mobile").value=mobile;
+ document.getElementById("name").value=c.name||"";
+ selectedPhoto=c.photo||"";
+ document.getElementById("photoInput").value="";
+ render();
+ msg("ग्राहक मिल गया।");
+}
+
+function addPurchase(){
+ const c=getActiveCustomer();
+ if(!c)return;
+
+ const amount=Number(document.getElementById("purchase").value);
+ if(!Number.isFinite(amount)||amount<=0){
+  msg("खरीदारी की सही राशि डालें।",false);
+  return;
+ }
+
+ const points=Math.floor(amount/100);
+ if(points<1){
+  msg("कम से कम ₹100 की खरीदारी जरूरी है।",false);
+  return;
+ }
+
+ c.points+=points;
+ addHistory(c,"खरीदारी ₹"+amount+" : +"+points+" पॉइंट");
+ saveData();
+ document.getElementById("purchase").value="";
+ render();
+ msg(points+" पॉइंट जोड़ दिए गए।");
+}
+
+function addManual(){
+ const c=getActiveCustomer();
+ if(!c)return;
+
+ const points=Number(document.getElementById("manual").value);
+ if(!Number.isSafeInteger(points)||points<=0){
+  msg("पॉइंट की सही संख्या डालें।",false);
+  return;
+ }
+
+ c.points+=points;
+ addHistory(c,"मैन्युअल पॉइंट : +"+points);
+ saveData();
+ document.getElementById("manual").value="";
+ render();
+ msg(points+" पॉइंट जोड़ दिए गए।");
+}
+
+function redeem(){
+ const c=getActiveCustomer();
+ if(!c)return;
+
+ const points=Number(document.getElementById("redeemAmount").value);
+
+ if(!Number.isSafeInteger(points)||points<100||points%100!==0){
+  msg("100, 200, 300 जैसे पॉइंट डालें।",false);
+  return;
+ }
+
+ if(points>c.points){
+  msg("ग्राहक के पास पर्याप्त पॉइंट नहीं हैं।",false);
+  return;
+ }
+
+ const expiry=localStorage.getItem(EXPIRY_KEY);
+ if(expiry){
+  const deadline=new Date(expiry).getTime();
+  if(!Number.isFinite(deadline)||Date.now()>deadline){
+   msg("पॉइंट रिडीम करने की समय-सीमा समाप्त हो गई है।",false);
+   return;
   }
-});
+ }
 
-$("searchBtn").addEventListener("click", searchCustomer);
-$("addBtn").addEventListener("click", addPurchase);
-$("redeemBtn").addEventListener("click", redeemPoints);
+ const discount=points/10;
+ if(!confirm(points+" पॉइंट के बदले ₹"+discount+" की छूट लागू करें?"))return;
 
-onAuthStateChanged(auth, user => {
-  $("loginSection").classList.toggle("hidden", !!user);
-  $("appSection").classList.toggle("hidden", !user);
+ c.points-=points;
+ addHistory(c,"रिडीम : -"+points+" पॉइंट, ₹"+discount+" छूट");
+ saveData();
+ document.getElementById("redeemAmount").value="";
+ render();
+ msg("रिडेम्प्शन दर्ज हुआ। अगली खरीदारी में ₹"+discount+" की छूट दें।");
+}
 
-  if (!user) {
-    currentCustomer = null;
-    $("history").textContent = "";
-    $("points").textContent = "0";
+function getActiveCustomer(){
+ if(!activeMobile||!customers[activeMobile]){
+  msg("पहले ग्राहक खोजें या सेव करें।",false);
+  return null;
+ }
+ return customers[activeMobile];
+}
+
+function render(){
+ const c=customers[activeMobile];
+ if(!c)return;
+
+ document.getElementById("profilePhoto").src=
+  c.photo||"https://placehold.co/125x125?text=Photo";
+
+ document.getElementById("totalPoints").textContent=c.points+" पॉइंट";
+ document.getElementById("discountValue").textContent=
+  "उपलब्ध छूट: ₹"+(c.points/10);
+
+ document.getElementById("profileSummary").textContent=
+  c.name+" | "+activeMobile;
+
+ const history=document.getElementById("history");
+ history.replaceChildren();
+
+ (c.history||[]).forEach(item=>{
+  const row=document.createElement("div");
+  row.className="record";
+  const date=document.createElement("div");
+  date.className="small";
+  date.textContent=item.date;
+  const detail=document.createElement("div");
+  detail.textContent=item.text;
+  row.append(date,detail);
+  history.appendChild(row);
+ });
+
+ if(!(c.history||[]).length){
+  history.textContent="अभी कोई लेन-देन नहीं हुआ है।";
+ }
+}
+
+function saveExpiry(){
+ const input=document.getElementById("expiry").value;
+ if(!input){
+  msg("अंतिम तारीख और समय चुनें।",false);
+  return;
+ }
+
+ const deadline=new Date(input).getTime();
+ if(!Number.isFinite(deadline)||deadline<=Date.now()){
+  msg("भविष्य की तारीख और समय चुनें।",false);
+  return;
+ }
+
+ localStorage.setItem(EXPIRY_KEY,input);
+ renderExpiry();
+ msg("रिडीम की समय-सीमा सेव हो गई।");
+}
+
+function renderExpiry(){
+ const expiry=localStorage.getItem(EXPIRY_KEY);
+ const status=document.getElementById("expiryStatus");
+
+ if(!expiry){
+  status.textContent="अभी कोई समय-सीमा सेट नहीं है।";
+  return;
+ }
+
+ document.getElementById("expiry").value=expiry;
+ const deadline=new Date(expiry);
+ status.textContent="अंतिम समय: "+deadline.toLocaleString("en-IN")+
+  (Date.now()>deadline.getTime()?" — समाप्त":" — चालू");
+}
+
+function exportBackup(){
+ const data={
+  customers:customers,
+  expiry:localStorage.getItem(EXPIRY_KEY)
+ };
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="dev-medical-rewards-backup.json";
+ a.click();
+ URL.revokeObjectURL(url);
+ msg("बैकअप फाइल तैयार कर दी गई।");
+}
+
+function importBackup(){
+ const file=document.getElementById("backupInput").files[0];
+ if(!file){
+  msg("पहले बैकअप JSON फाइल चुनें।",false);
+  return;
+ }
+
+ const reader=new FileReader();
+ reader.onload=function(){
+  try{
+   const data=JSON.parse(reader.result);
+   if(!data.customers||typeof data.customers!=="object"){
+    throw new Error("Invalid backup");
+   }
+
+   if(!confirm("मौजूदा डेटा बैकअप से बदल जाएगा। जारी रखें?"))return;
+
+   customers=data.customers;
+   saveData();
+
+   if(data.expiry)localStorage.setItem(EXPIRY_KEY,data.expiry);
+   else localStorage.removeItem(EXPIRY_KEY);
+
+   activeMobile="";
+   renderExpiry();
+   msg("बैकअप सफलतापूर्वक इम्पोर्ट हुआ।");
+  }catch(e){
+   msg("बैकअप फाइल सही नहीं है।",false);
   }
-});
+ };
+ reader.readAsText(file);
+}
+
+renderExpiry();
 </script>
-
 </body>
 </html>
