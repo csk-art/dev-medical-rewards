@@ -2,24 +2,28 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DEV MEDICAL STORE Rewards</title>
+
 <style>
 body {
   font-family: Arial, sans-serif;
   background: #f0f4f8;
   margin: 0;
-  padding: 20px;
+  padding: 15px;
 }
 .container {
   max-width: 450px;
-  margin: auto;
+  margin: 20px auto;
   background: white;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 2px 10px #ccc;
 }
-h1 { color: #087443; text-align: center; }
+h1 {
+  color: #087443;
+  text-align: center;
+}
 input, button {
   width: 100%;
   box-sizing: border-box;
@@ -28,102 +32,418 @@ input, button {
   border-radius: 8px;
   font-size: 16px;
 }
-input { border: 1px solid #ccc; }
+input {
+  border: 1px solid #ccc;
+}
 button {
   background: #087443;
   color: white;
   border: none;
   font-weight: bold;
 }
+.secondary {
+  background: #555;
+}
 .points {
   background: #e0f5e8;
   padding: 15px;
   text-align: center;
   border-radius: 10px;
+  margin: 15px 0;
+}
+.hidden {
+  display: none;
+}
+#message {
+  overflow-wrap: anywhere;
 }
 </style>
 </head>
+
 <body>
+
 <div class="container">
-<h1>DEV MEDICAL STORE</h1>
-<p style="text-align:center">Customer Reward Points</p>
+  <h1>DEV MEDICAL STORE</h1>
+  <p style="text-align:center">Customer Reward Points</p>
 
-<label>Customer Name</label>
-<input id="name" placeholder="ग्राहक का नाम">
+  <section id="loginSection">
+    <h3>Shopkeeper Login</h3>
 
-<label>Mobile Number</label>
-<input id="mobile" placeholder="10 अंकों का मोबाइल नंबर"
-       inputmode="numeric" maxlength="10">
+    <label>Email</label>
+    <input id="email" type="email"
+           placeholder="दुकानदार का Email">
 
-<label>Purchase Amount (₹)</label>
-<input id="amount" type="number" min="0" placeholder="खरीदारी की राशि">
+    <label>Password</label>
+    <input id="password" type="password"
+           placeholder="Password">
 
-<button onclick="addPoints()">Add Purchase & Points</button>
+    <button id="loginBtn">Login</button>
+    <p id="loginMessage"></p>
+  </section>
 
-<div class="points">
-<h3>Available Points</h3>
-<h1 id="points">0</h1>
-<p>100 पॉइंट = ₹10 का रिवॉर्ड</p>
+  <section id="appSection" class="hidden">
+
+    <p>Login सफल हुआ।</p>
+    <button id="logoutBtn" class="secondary">Logout</button>
+
+    <hr>
+
+    <label>Customer Mobile Number</label>
+    <input id="mobile" inputmode="numeric"
+           maxlength="10" placeholder="10 अंकों का मोबाइल नंबर">
+
+    <button id="searchBtn" class="secondary">
+      Search Customer
+    </button>
+
+    <label>Customer Name</label>
+    <input id="name" placeholder="ग्राहक का नाम">
+
+    <label>Purchase Amount (₹)</label>
+    <input id="amount" type="number"
+           min="1" placeholder="खरीदारी की राशि">
+
+    <button id="addBtn">Add Purchase & Points</button>
+
+    <div class="points">
+      <h3>Available Points</h3>
+      <h1 id="points">0</h1>
+      <p>100 पॉइंट = ₹10 का रिवॉर्ड</p>
+    </div>
+
+    <label>Redeem Points</label>
+    <input id="redeem" type="number"
+           min="100" step="100"
+           placeholder="100, 200, 300...">
+
+    <button id="redeemBtn">Redeem Points</button>
+
+    <h3>Purchase History</h3>
+    <div id="history">ग्राहक खोजने पर रिकॉर्ड दिखेगा।</div>
+
+    <p id="message" aria-live="polite"></p>
+  </section>
 </div>
 
-<label>Redeem Points</label>
-<input id="redeem" type="number" min="0" placeholder="कितने पॉइंट इस्तेमाल करने हैं">
-<button onclick="redeemPoints()">Redeem Points</button>
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 
-<p id="message"></p>
-</div>
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
-<script>
-function getCustomers() {
-  return JSON.parse(localStorage.getItem("devCustomers") || "{}");
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  runTransaction,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDSaB6azxPF0fXPmTaeXx_1MCWoeGIJPf0",
+  authDomain: "dev-medical-rewards.firebaseapp.com",
+  projectId: "dev-medical-rewards",
+  storageBucket: "dev-medical-rewards.firebasestorage.app",
+  messagingSenderId: "309364119063",
+  appId: "1:309364119063:web:9a110096720368b599ee52",
+  measurementId: "G-ZHY42CNC1W"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+
+let currentCustomer = null;
+let busy = false;
+
+function message(text) {
+  $("message").textContent = text;
 }
 
-function saveCustomers(data) {
-  localStorage.setItem("devCustomers", JSON.stringify(data));
+function setBusy(value) {
+  busy = value;
+  ["loginBtn", "searchBtn", "addBtn",
+   "redeemBtn", "logoutBtn"].forEach(id => {
+    $(id).disabled = value;
+  });
 }
 
-function addPoints() {
-  const name = document.getElementById("name").value.trim();
-  const mobile = document.getElementById("mobile").value.trim();
-  const amount = Number(document.getElementById("amount").value);
+function validMobile() {
+  return /^\d{10}$/.test($("mobile").value.trim());
+}
 
-  if (!name || !/^\d{10}$/.test(mobile) ||
-      !Number.isFinite(amount) || amount <= 0) {
-    alert("नाम, सही 10 अंकों का मोबाइल नंबर और खरीदारी की राशि भरें।");
+function customerRef(mobile) {
+  return doc(db, "customers", mobile);
+}
+
+function showCustomer(data) {
+  currentCustomer = data;
+  $("name").value = data.name || "";
+  $("points").textContent = data.points || 0;
+}
+
+async function searchCustomer() {
+  if (!validMobile()) {
+    message("सही 10 अंकों का मोबाइल नंबर भरें।");
     return;
   }
 
-  const customers = getCustomers();
-  if (!customers[mobile]) customers[mobile] = {name, points: 0};
+  setBusy(true);
 
-  customers[mobile].name = name;
+  try {
+    const mobile = $("mobile").value.trim();
+    const snap = await getDoc(customerRef(mobile));
+
+    if (!snap.exists()) {
+      currentCustomer = null;
+      $("name").value = "";
+      $("points").textContent = "0";
+      $("history").textContent = "नया ग्राहक।";
+      message("ग्राहक नहीं मिला। नाम भरकर खरीदारी दर्ज कर सकते हैं।");
+      return;
+    }
+
+    showCustomer(snap.data());
+    await loadHistory(mobile);
+    message("ग्राहक का रिकॉर्ड मिल गया।");
+  } catch (error) {
+    console.error(error);
+    message("डेटा नहीं मिला। Login और Database Rules जाँचें।");
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function loadHistory(mobile) {
+  const list = $("history");
+  list.textContent = "रिकॉर्ड लोड हो रहा है...";
+
+  const historyQuery = query(
+    collection(db, "customers", mobile, "transactions"),
+    orderBy("createdAt", "desc")
+  );
+
+  const result = await getDocs(historyQuery);
+  list.replaceChildren();
+
+  if (result.empty) {
+    list.textContent = "अभी कोई खरीदारी दर्ज नहीं है।";
+    return;
+  }
+
+  result.forEach(item => {
+    const t = item.data();
+    const row = document.createElement("p");
+
+    const date = t.createdAt?.toDate
+      ? t.createdAt.toDate().toLocaleString("hi-IN")
+      : "अभी-अभी";
+
+    row.textContent =
+      date + " — " + t.type +
+      (t.amount != null ? " — ₹" + t.amount : "") +
+      " — " + (t.pointsChange > 0 ? "+" : "") +
+      t.pointsChange + " पॉइंट";
+
+    list.appendChild(row);
+  });
+}
+
+async function addPurchase() {
+  if (!validMobile()) {
+    message("पहले सही मोबाइल नंबर भरें।");
+    return;
+  }
+
+  const mobile = $("mobile").value.trim();
+  const name = $("name").value.trim();
+  const amount = Number($("amount").value);
+
+  if (!name || !Number.isFinite(amount) || amount <= 0) {
+    message("ग्राहक का नाम और सही खरीदारी राशि भरें।");
+    return;
+  }
+
   const earned = Math.floor(amount / 100);
-  customers[mobile].points += earned;
 
-  saveCustomers(customers);
-  document.getElementById("points").textContent = customers[mobile].points;
-  document.getElementById("message").textContent =
-    "खरीदारी दर्ज हुई। " + earned + " पॉइंट जोड़े गए।";
-}
-
-function redeemPoints() {
-  const mobile = document.getElementById("mobile").value.trim();
-  const redeem = Number(document.getElementById("redeem").value);
-  const customers = getCustomers();
-  const customer = customers[mobile];
-
-  if (!customer || !Number.isInteger(redeem) || redeem <= 0 ||
-      redeem > customer.points || redeem % 100 !== 0) {
-    alert("ग्राहक के उपलब्ध पॉइंट जाँचें। रिडीम राशि 100 के गुणक में होनी चाहिए।");
+  if (earned < 1) {
+    message("पॉइंट पाने के लिए खरीदारी कम से कम ₹100 होनी चाहिए।");
     return;
   }
 
-  customer.points -= redeem;
-  saveCustomers(customers);
-  document.getElementById("points").textContent = customer.points;
-  document.getElementById("message").textContent =
-    redeem + " पॉइंट इस्तेमाल हुए। छूट का मूल्य ₹" + (redeem / 10);
+  if (!confirm(
+    "खरीदारी ₹" + amount + " दर्ज करें और " +
+    earned + " पॉइंट जोड़ें?"
+  )) return;
+
+  setBusy(true);
+
+  try {
+    const ref = customerRef(mobile);
+
+    await runTransaction(db, async transaction => {
+      const snap = await transaction.get(ref);
+      const old = snap.exists() ? snap.data() : {};
+
+      transaction.set(ref, {
+        name,
+        mobile,
+        points: (old.points || 0) + earned,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      const historyRef = doc(
+        collection(db, "customers", mobile, "transactions")
+      );
+
+      transaction.set(historyRef, {
+        type: "Purchase",
+        amount,
+        pointsChange: earned,
+        createdAt: serverTimestamp()
+      });
+    });
+
+    $("amount").value = "";
+    await searchCustomer();
+    message(earned + " पॉइंट सफलतापूर्वक जुड़ गए।");
+  } catch (error) {
+    console.error(error);
+    message("खरीदारी सेव नहीं हुई। Database Rules जाँचें।");
+  } finally {
+    setBusy(false);
+  }
 }
+
+async function redeemPoints() {
+  if (!validMobile()) {
+    message("पहले ग्राहक का मोबाइल नंबर भरें।");
+    return;
+  }
+
+  const mobile = $("mobile").value.trim();
+  const redeem = Number($("redeem").value);
+
+  if (!Number.isInteger(redeem) || redeem < 100 ||
+      redeem % 100 !== 0) {
+    message("रिडीम पॉइंट 100 के गुणक में होने चाहिए।");
+    return;
+  }
+
+  if (!confirm(
+    redeem + " पॉइंट रिडीम करें? छूट का मूल्य ₹" +
+    (redeem / 10) + " होगा।"
+  )) return;
+
+  setBusy(true);
+
+  try {
+    const ref = customerRef(mobile);
+
+    await runTransaction(db, async transaction => {
+      const snap = await transaction.get(ref);
+
+      if (!snap.exists()) {
+        throw new Error("CUSTOMER_NOT_FOUND");
+      }
+
+      const customer = snap.data();
+      const balance = customer.points || 0;
+
+      if (redeem > balance) {
+        throw new Error("INSUFFICIENT_POINTS");
+      }
+
+      transaction.update(ref, {
+        points: balance - redeem,
+        updatedAt: serverTimestamp()
+      });
+
+      const historyRef = doc(
+        collection(db, "customers", mobile, "transactions")
+      );
+
+      transaction.set(historyRef, {
+        type: "Redeem",
+        amount: redeem / 10,
+        pointsChange: -redeem,
+        createdAt: serverTimestamp()
+      });
+    });
+
+    $("redeem").value = "";
+    await searchCustomer();
+    message(redeem + " पॉइंट रिडीम हुए। छूट ₹" + redeem / 10);
+  } catch (error) {
+    console.error(error);
+
+    if (error.message === "CUSTOMER_NOT_FOUND") {
+      message("ग्राहक का रिकॉर्ड नहीं मिला।");
+    } else if (error.message === "INSUFFICIENT_POINTS") {
+      message("ग्राहक के पास पर्याप्त पॉइंट नहीं हैं।");
+    } else {
+      message("रिडीम नहीं हुआ। Database Rules जाँचें।");
+    }
+  } finally {
+    setBusy(false);
+  }
+}
+
+$("loginBtn").addEventListener("click", async () => {
+  setBusy(true);
+  $("loginMessage").textContent = "";
+
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      $("email").value.trim(),
+      $("password").value
+    );
+    $("password").value = "";
+  } catch (error) {
+    console.error(error);
+    $("loginMessage").textContent =
+      "Login नहीं हुआ। Email और Password जाँचें।";
+  } finally {
+    setBusy(false);
+  }
+});
+
+$("logoutBtn").addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    message("Logout नहीं हुआ। दोबारा कोशिश करें।");
+  }
+});
+
+$("searchBtn").addEventListener("click", searchCustomer);
+$("addBtn").addEventListener("click", addPurchase);
+$("redeemBtn").addEventListener("click", redeemPoints);
+
+onAuthStateChanged(auth, user => {
+  $("loginSection").classList.toggle("hidden", !!user);
+  $("appSection").classList.toggle("hidden", !user);
+
+  if (!user) {
+    currentCustomer = null;
+    $("history").textContent = "";
+    $("points").textContent = "0";
+  }
+});
 </script>
+
 </body>
 </html>
