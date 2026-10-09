@@ -8,8 +8,7 @@
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;padding:15px;
- font-family:Arial,sans-serif;
+ margin:0;padding:15px;font-family:Arial,sans-serif;
  background:#eef4f8;color:#222
 }
 .container{
@@ -55,10 +54,14 @@ button{
  width:55px;height:55px;border-radius:50%;
  object-fit:cover;background:#eee
 }
-.customer-row button{width:auto;padding:8px}
 #message{
  margin-top:15px;padding:12px;border-radius:8px;
  white-space:pre-line
+}
+.batch{
+ background:#f5f8fa;padding:12px;
+ margin-top:8px;border-radius:8px;
+ border-left:4px solid #087443
 }
 .hidden{display:none}
 </style>
@@ -76,7 +79,9 @@ button{
  alt="ग्राहक की फोटो">
  <div class="points" id="totalPoints">0 पॉइंट</div>
  <p id="discountValue">उपलब्ध छूट: ₹0</p>
- <p class="small" id="profileSummary">ग्राहक चुनें या नया ग्राहक जोड़ें।</p>
+ <p class="small" id="profileSummary">
+ ग्राहक चुनें या नया ग्राहक जोड़ें।
+ </p>
 </div>
 
 <h3>👤 ग्राहक की जानकारी</h3>
@@ -89,12 +94,8 @@ button{
  maxlength="10" placeholder="10 अंकों का मोबाइल नंबर">
 
 <label>ग्राहक की फोटो — कैमरा या गैलरी</label>
-<input id="photoInput" type="file"
- accept="image/*" capture="environment">
-
-<p class="small">
-कैमरे से फोटो खींचें या गैलरी से फोटो चुनें।
-</p>
+<input id="photoInput" type="file" accept="image/*" capture="environment">
+<p class="small">कैमरे से फोटो खींचें या गैलरी से चुनें।</p>
 
 <button onclick="saveCustomer()">ग्राहक सेव करें</button>
 
@@ -103,45 +104,67 @@ button{
  maxlength="10" placeholder="मोबाइल नंबर डालें">
 <button class="blue" onclick="searchCustomer()">ग्राहक खोजें</button>
 
-<div id="customerList"></div>
-
 <h3>🛒 खरीदारी पर पॉइंट</h3>
 <label>खरीदारी की राशि ₹</label>
-<input id="purchase" type="number" min="0"
- step="0.01" placeholder="जैसे 500">
+<input id="purchase" type="number" min="0" step="0.01"
+ placeholder="जैसे 500">
 
-<button onclick="addPurchase()">खरीदारी के पॉइंट जोड़ें</button>
-<p class="small">नियम: हर ₹100 की खरीदारी पर 1 पॉइंट।</p>
+<p class="small">हर ₹100 की खरीदारी पर 1 पॉइंट।</p>
 
 <h3>➕ अतिरिक्त पॉइंट</h3>
 <label>पॉइंट की संख्या</label>
-<input id="manual" type="number" min="1"
- step="1" placeholder="जैसे 20">
-<button class="blue" onclick="addManual()">अतिरिक्त पॉइंट जोड़ें</button>
+<input id="manual" type="number" min="1" step="1"
+ placeholder="जैसे 20">
+
+<h3>⏰ इन नए पॉइंट की Expiry Date</h3>
+<label>अंतिम तारीख और समय चुनें</label>
+<input id="expiry" type="datetime-local">
+
+<p class="small">
+यह तारीख केवल अभी जोड़े जाने वाले पॉइंट के लिए सेव होगी।
+हर बार पॉइंट जोड़ते समय नई तारीख चुन सकते हैं।
+तारीख समाप्त होने के बाद वे पॉइंट रिडीम नहीं होंगे।
+</p>
+
+<button class="blue" onclick="addManual()">
+ अतिरिक्त पॉइंट जोड़ें
+</button>
+
+<button onclick="addPurchase()">
+ खरीदारी के पॉइंट जोड़ें
+</button>
+
+<h3>📊 पॉइंट का विवरण</h3>
+<div id="batchDetails">
+ ग्राहक चुनने पर विवरण दिखाई देगा।
+</div>
 
 <h3>🎁 पॉइंट रिडीम करें</h3>
 <label>रिडीम पॉइंट</label>
 <input id="redeemAmount" type="number" min="100"
  step="100" placeholder="जैसे 100">
-<button class="orange" onclick="redeem()">पॉइंट रिडीम करें</button>
-<p class="small">100 पॉइंट = ₹10 की छूट। नकद भुगतान नहीं मिलेगा।</p>
 
-<h3>⏰ रिडीम की अंतिम तारीख</h3>
-<label>तारीख और समय</label>
-<input id="expiry" type="datetime-local">
-<button class="blue" onclick="saveExpiry()">समय-सीमा सेव करें</button>
-<p id="expiryStatus" class="small"></p>
+<button class="orange" onclick="redeem()">पॉइंट रिडीम करें</button>
+
+<p class="small">
+100 पॉइंट = ₹10 की छूट। नकद भुगतान नहीं मिलेगा।
+पुराने पॉइंट पहले इस्तेमाल होंगे।
+</p>
 
 <h3>📜 लेन-देन का इतिहास</h3>
 <div id="history">ग्राहक चुनने पर इतिहास दिखाई देगा।</div>
 
 <h3>💾 डेटा बैकअप</h3>
 <button class="blue" onclick="exportBackup()">बैकअप डाउनलोड करें</button>
+
 <label>बैकअप फाइल से डेटा वापस लाएँ</label>
 <input id="backupInput" type="file" accept=".json,application/json">
 <button class="blue" onclick="importBackup()">बैकअप इम्पोर्ट करें</button>
+
 <p class="small">
-जरूरी: डेटा इसी ब्राउज़र में सेव होता है। ब्राउज़र का डेटा साफ करने या मोबाइल बदलने पर डेटा खो सकता है। नियमित बैकअप रखें।
+जरूरी: डेटा इसी ब्राउज़र में सेव होता है।
+ब्राउज़र का डेटा साफ करने या मोबाइल बदलने पर डेटा खो सकता है।
+नियमित बैकअप रखें।
 </p>
 
 <div id="message"></div>
@@ -156,18 +179,72 @@ let customers = {};
 let activeMobile = "";
 let selectedPhoto = "";
 
+/* पुराने रिकॉर्ड को नए पॉइंट बैच सिस्टम में बदलें */
+function normalizeCustomer(c, oldExpiry){
+ if(!c || typeof c !== "object") c = {};
+
+ c.name = c.name || "";
+ c.photo = c.photo || "";
+ c.history = Array.isArray(c.history) ? c.history : [];
+
+ if(!Array.isArray(c.lots)){
+  const oldPoints = Math.max(0, Number(c.points) || 0);
+
+  c.lots = [];
+
+  if(oldPoints > 0){
+   c.lots.push({
+    id:makeId(),
+    points:Math.floor(oldPoints),
+    expiry:oldExpiry || null,
+    createdAt:Date.now()
+   });
+  }
+ }
+
+ c.lots = c.lots.filter(lot =>
+  lot && Number.isFinite(Number(lot.points)) &&
+  Number(lot.points) > 0
+ );
+
+ c.lots.forEach(lot=>{
+  lot.points = Math.floor(Number(lot.points));
+  if(!lot.id) lot.id = makeId();
+  if(!("expiry" in lot)) lot.expiry = null;
+  if(!lot.createdAt) lot.createdAt = Date.now();
+ });
+
+ delete c.points;
+ return c;
+}
+
+function makeId(){
+ return Date.now().toString(36) +
+ Math.random().toString(36).slice(2,8);
+}
+
 function loadData(){
  try{
-  customers = JSON.parse(localStorage.getItem(DATA_KEY) || "{}");
+  const saved = JSON.parse(localStorage.getItem(DATA_KEY) || "{}");
+  const oldExpiry = localStorage.getItem(EXPIRY_KEY);
+
+  customers = saved && typeof saved === "object" ? saved : {};
+
+  Object.keys(customers).forEach(mobile=>{
+   customers[mobile] = normalizeCustomer(customers[mobile], oldExpiry);
+  });
+
+  saveData();
  }catch(e){
   customers = {};
  }
 }
-loadData();
 
 function saveData(){
  localStorage.setItem(DATA_KEY, JSON.stringify(customers));
 }
+
+loadData();
 
 function msg(text, ok=true){
  const el=document.getElementById("message");
@@ -188,6 +265,7 @@ function customerFromForm(){
   msg("ग्राहक का नाम भरें।",false);
   return null;
  }
+
  if(!validMobile(mobile)){
   msg("सही 10 अंकों का मोबाइल नंबर भरें।",false);
   return null;
@@ -195,12 +273,17 @@ function customerFromForm(){
 
  if(!customers[mobile]){
   customers[mobile]={
-   name:name,photo:"",points:0,history:[]
+   name:name,
+   photo:"",
+   lots:[],
+   history:[]
   };
  }
- const c=customers[mobile];
+
+ const c=normalizeCustomer(customers[mobile],null);
  c.name=name;
- c.history=c.history||[];
+ customers[mobile]=c;
+
  return {mobile,c};
 }
 
@@ -228,21 +311,33 @@ document.getElementById("photoInput").addEventListener("change",function(){
  }
 
  const reader=new FileReader();
+
  reader.onload=function(e){
   const img=new Image();
+
   img.onload=function(){
    const canvas=document.createElement("canvas");
    const max=400;
    const scale=Math.min(1,max/Math.max(img.width,img.height));
+
    canvas.width=Math.round(img.width*scale);
    canvas.height=Math.round(img.height*scale);
-   canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+
+   canvas.getContext("2d").drawImage(
+    img,0,0,canvas.width,canvas.height
+   );
+
    selectedPhoto=canvas.toDataURL("image/jpeg",0.75);
    document.getElementById("profilePhoto").src=selectedPhoto;
   };
-  img.onerror=function(){msg("फोटो पढ़ी नहीं जा सकी।",false);};
+
+  img.onerror=function(){
+   msg("फोटो पढ़ी नहीं जा सकी।",false);
+  };
+
   img.src=e.target.result;
  };
+
  reader.readAsDataURL(file);
 });
 
@@ -251,7 +346,10 @@ function saveCustomer(){
  if(!result)return;
 
  const {mobile,c}=result;
- if(selectedPhoto)c.photo=selectedPhoto;
+
+ if(selectedPhoto){
+  c.photo=selectedPhoto;
+ }
 
  saveData();
  activeMobile=mobile;
@@ -268,6 +366,7 @@ function searchCustomer(){
  }
 
  const c=customers[mobile];
+
  if(!c){
   msg("यह ग्राहक नहीं मिला। नाम भरकर नया ग्राहक सेव कर सकते हैं।",false);
   document.getElementById("mobile").value=mobile;
@@ -279,8 +378,56 @@ function searchCustomer(){
  document.getElementById("name").value=c.name||"";
  selectedPhoto=c.photo||"";
  document.getElementById("photoInput").value="";
+
  render();
  msg("ग्राहक मिल गया।");
+}
+
+/* चुनी हुई Expiry केवल इस नए बैच पर लागू होगी */
+function getNewBatchExpiry(){
+ const input=document.getElementById("expiry").value;
+
+ if(!input){
+  msg("पहले नए पॉइंट की Expiry Date और समय चुनें।",false);
+  return false;
+ }
+
+ const deadline=new Date(input).getTime();
+
+ if(!Number.isFinite(deadline) || deadline<=Date.now()){
+  msg("भविष्य की Expiry Date और समय चुनें।",false);
+  return false;
+ }
+
+ return input;
+}
+
+function addPointsBatch(c,points,description){
+ const expiry=getNewBatchExpiry();
+ if(!expiry)return false;
+
+ c.lots.push({
+  id:makeId(),
+  points:points,
+  expiry:expiry,
+  createdAt:Date.now()
+ });
+
+ addHistory(
+  c,
+  description+" : +"+points+" पॉइंट | Expiry: "+
+  new Date(expiry).toLocaleString("en-IN")
+ );
+
+ saveData();
+
+ /* अगली बार नई Expiry चुननी होगी */
+ document.getElementById("expiry").value="";
+
+ render();
+ msg(points+" पॉइंट जोड़ दिए गए। उनकी Expiry अलग से सेव हो गई।");
+
+ return true;
 }
 
 function addPurchase(){
@@ -288,23 +435,22 @@ function addPurchase(){
  if(!c)return;
 
  const amount=Number(document.getElementById("purchase").value);
+
  if(!Number.isFinite(amount)||amount<=0){
   msg("खरीदारी की सही राशि डालें।",false);
   return;
  }
 
  const points=Math.floor(amount/100);
+
  if(points<1){
   msg("कम से कम ₹100 की खरीदारी जरूरी है।",false);
   return;
  }
 
- c.points+=points;
- addHistory(c,"खरीदारी ₹"+amount+" : +"+points+" पॉइंट");
- saveData();
- document.getElementById("purchase").value="";
- render();
- msg(points+" पॉइंट जोड़ दिए गए।");
+ if(addPointsBatch(c,points,"खरीदारी ₹"+amount)){
+  document.getElementById("purchase").value="";
+ }
 }
 
 function addManual(){
@@ -312,17 +458,37 @@ function addManual(){
  if(!c)return;
 
  const points=Number(document.getElementById("manual").value);
+
  if(!Number.isSafeInteger(points)||points<=0){
   msg("पॉइंट की सही संख्या डालें।",false);
   return;
  }
 
- c.points+=points;
- addHistory(c,"मैन्युअल पॉइंट : +"+points);
- saveData();
- document.getElementById("manual").value="";
- render();
- msg(points+" पॉइंट जोड़ दिए गए।");
+ if(addPointsBatch(c,points,"मैन्युअल पॉइंट")){
+  document.getElementById("manual").value="";
+ }
+}
+
+function isExpired(lot){
+ if(!lot.expiry)return false;
+
+ const deadline=new Date(lot.expiry).getTime();
+
+ return !Number.isFinite(deadline) || Date.now()>deadline;
+}
+
+function availablePoints(c){
+ return c.lots.reduce((total,lot)=>{
+  if(!isExpired(lot))return total+lot.points;
+  return total;
+ },0);
+}
+
+function expiredPoints(c){
+ return c.lots.reduce((total,lot)=>{
+  if(isExpired(lot))return total+lot.points;
+  return total;
+ },0);
 }
 
 function redeem(){
@@ -336,29 +502,63 @@ function redeem(){
   return;
  }
 
- if(points>c.points){
-  msg("ग्राहक के पास पर्याप्त पॉइंट नहीं हैं।",false);
+ const available=availablePoints(c);
+
+ if(points>available){
+  msg(
+   "पर्याप्त वैध पॉइंट नहीं हैं। उपलब्ध पॉइंट: "+available,
+   false
+  );
   return;
  }
 
- const expiry=localStorage.getItem(EXPIRY_KEY);
- if(expiry){
-  const deadline=new Date(expiry).getTime();
-  if(!Number.isFinite(deadline)||Date.now()>deadline){
-   msg("पॉइंट रिडीम करने की समय-सीमा समाप्त हो गई है।",false);
-   return;
-  }
+ const discount=points/10;
+
+ if(!confirm(
+  points+" पॉइंट के बदले ₹"+discount+
+  " की छूट लागू करें? पुराने पॉइंट पहले इस्तेमाल होंगे।"
+ ))return;
+
+ /*
+   FIFO:
+   पहले सबसे पहले Expire होने वाले पॉइंट,
+   और समान Expiry होने पर पुराने बैच पहले।
+ */
+ const lots=c.lots
+  .filter(lot=>!isExpired(lot)&&lot.points>0)
+  .sort((a,b)=>{
+   const ea=a.expiry?new Date(a.expiry).getTime():Infinity;
+   const eb=b.expiry?new Date(b.expiry).getTime():Infinity;
+
+   if(ea!==eb)return ea-eb;
+   return a.createdAt-b.createdAt;
+  });
+
+ let remaining=points;
+
+ for(const lot of lots){
+  if(remaining<=0)break;
+
+  const used=Math.min(lot.points,remaining);
+  lot.points-=used;
+  remaining-=used;
  }
 
- const discount=points/10;
- if(!confirm(points+" पॉइंट के बदले ₹"+discount+" की छूट लागू करें?"))return;
+ c.lots=c.lots.filter(lot=>lot.points>0);
 
- c.points-=points;
- addHistory(c,"रिडीम : -"+points+" पॉइंट, ₹"+discount+" छूट");
+ addHistory(
+  c,
+  "रिडीम : -"+points+" पॉइंट, ₹"+discount+" छूट"
+ );
+
  saveData();
  document.getElementById("redeemAmount").value="";
+
  render();
- msg("रिडेम्प्शन दर्ज हुआ। अगली खरीदारी में ₹"+discount+" की छूट दें।");
+ msg(
+  "रिडेम्प्शन दर्ज हुआ। अगली खरीदारी में ₹"+
+  discount+" की छूट दें। पुराने पॉइंट पहले इस्तेमाल हुए।"
+ );
 }
 
 function getActiveCustomer(){
@@ -366,6 +566,7 @@ function getActiveCustomer(){
   msg("पहले ग्राहक खोजें या सेव करें।",false);
   return null;
  }
+
  return customers[activeMobile];
 }
 
@@ -373,15 +574,66 @@ function render(){
  const c=customers[activeMobile];
  if(!c)return;
 
+ const available=availablePoints(c);
+ const expired=expiredPoints(c);
+
  document.getElementById("profilePhoto").src=
   c.photo||"https://placehold.co/125x125?text=Photo";
 
- document.getElementById("totalPoints").textContent=c.points+" पॉइंट";
+ document.getElementById("totalPoints").textContent=
+  available+" पॉइंट";
+
  document.getElementById("discountValue").textContent=
-  "उपलब्ध छूट: ₹"+(c.points/10);
+  "उपलब्ध छूट: ₹"+Math.floor(available/100)*10;
 
  document.getElementById("profileSummary").textContent=
-  c.name+" | "+activeMobile;
+  c.name+" | "+activeMobile+
+  " | एक्सपायर पॉइंट: "+expired;
+
+ const details=document.getElementById("batchDetails");
+ details.replaceChildren();
+
+ const sorted=[...c.lots].sort((a,b)=>{
+  const ea=a.expiry?new Date(a.expiry).getTime():Infinity;
+  const eb=b.expiry?new Date(b.expiry).getTime():Infinity;
+  return ea-eb;
+ });
+
+ if(sorted.length===0){
+  details.textContent="कोई पॉइंट बैच उपलब्ध नहीं है।";
+ }else{
+  sorted.forEach(lot=>{
+   const box=document.createElement("div");
+   box.className="batch";
+
+   const title=document.createElement("strong");
+   title.textContent=lot.points+" पॉइंट";
+
+   const date=document.createElement("div");
+   date.className="small";
+
+   if(lot.expiry){
+    date.textContent="Expiry: "+
+     new Date(lot.expiry).toLocaleString("en-IN");
+   }else{
+    date.textContent="Expiry: सेट नहीं (पुराना रिकॉर्ड)";
+   }
+
+   const status=document.createElement("div");
+   status.className="small";
+
+   if(isExpired(lot)){
+    status.textContent="स्थिति: एक्सपायर — रिडीम नहीं हो सकते";
+    status.style.color="#c0392b";
+   }else{
+    status.textContent="स्थिति: वैध";
+    status.style.color="#087443";
+   }
+
+   box.append(title,date,status);
+   details.appendChild(box);
+  });
+ }
 
  const history=document.getElementById("history");
  history.replaceChildren();
@@ -389,11 +641,14 @@ function render(){
  (c.history||[]).forEach(item=>{
   const row=document.createElement("div");
   row.className="record";
+
   const date=document.createElement("div");
   date.className="small";
-  date.textContent=item.date;
+  date.textContent=item.date||"";
+
   const detail=document.createElement("div");
-  detail.textContent=item.text;
+  detail.textContent=item.text||"";
+
   row.append(date,detail);
   history.appendChild(row);
  });
@@ -403,88 +658,102 @@ function render(){
  }
 }
 
-function saveExpiry(){
- const input=document.getElementById("expiry").value;
- if(!input){
-  msg("अंतिम तारीख और समय चुनें।",false);
-  return;
- }
-
- const deadline=new Date(input).getTime();
- if(!Number.isFinite(deadline)||deadline<=Date.now()){
-  msg("भविष्य की तारीख और समय चुनें।",false);
-  return;
- }
-
- localStorage.setItem(EXPIRY_KEY,input);
- renderExpiry();
- msg("रिडीम की समय-सीमा सेव हो गई।");
-}
-
-function renderExpiry(){
- const expiry=localStorage.getItem(EXPIRY_KEY);
- const status=document.getElementById("expiryStatus");
-
- if(!expiry){
-  status.textContent="अभी कोई समय-सीमा सेट नहीं है।";
-  return;
- }
-
- document.getElementById("expiry").value=expiry;
- const deadline=new Date(expiry);
- status.textContent="अंतिम समय: "+deadline.toLocaleString("en-IN")+
-  (Date.now()>deadline.getTime()?" — समाप्त":" — चालू");
-}
-
 function exportBackup(){
  const data={
   customers:customers,
   expiry:localStorage.getItem(EXPIRY_KEY)
  };
- const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+
+ const blob=new Blob(
+  [JSON.stringify(data,null,2)],
+  {type:"application/json"}
+ );
+
  const url=URL.createObjectURL(blob);
  const a=document.createElement("a");
+
  a.href=url;
  a.download="dev-medical-rewards-backup.json";
  a.click();
- URL.revokeObjectURL(url);
+
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+
  msg("बैकअप फाइल तैयार कर दी गई।");
 }
 
 function importBackup(){
  const file=document.getElementById("backupInput").files[0];
+
  if(!file){
   msg("पहले बैकअप JSON फाइल चुनें।",false);
   return;
  }
 
  const reader=new FileReader();
+
  reader.onload=function(){
   try{
    const data=JSON.parse(reader.result);
-   if(!data.customers||typeof data.customers!=="object"){
+
+   if(!data.customers ||
+      typeof data.customers!=="object" ||
+      Array.isArray(data.customers)){
     throw new Error("Invalid backup");
    }
 
-   if(!confirm("मौजूदा डेटा बैकअप से बदल जाएगा। जारी रखें?"))return;
+   if(!confirm("मौजूदा डेटा बैकअप से बदल जाएगा। जारी रखें?")){
+    return;
+   }
 
+   const oldExpiry=data.expiry||null;
    customers=data.customers;
-   saveData();
 
-   if(data.expiry)localStorage.setItem(EXPIRY_KEY,data.expiry);
-   else localStorage.removeItem(EXPIRY_KEY);
+   Object.keys(customers).forEach(mobile=>{
+    customers[mobile]=normalizeCustomer(
+     customers[mobile],oldExpiry
+    );
+   });
+
+   saveData();
+   localStorage.removeItem(EXPIRY_KEY);
 
    activeMobile="";
-   renderExpiry();
+   selectedPhoto="";
+
+   document.getElementById("profileSummary").textContent=
+    "ग्राहक चुनें या नया ग्राहक जोड़ें।";
+
+   document.getElementById("totalPoints").textContent="0 पॉइंट";
+   document.getElementById("discountValue").textContent="उपलब्ध छूट: ₹0";
+   document.getElementById("profilePhoto").src=
+    "https://placehold.co/125x125?text=Photo";
+
+   document.getElementById("batchDetails").textContent=
+    "ग्राहक चुनने पर विवरण दिखाई देगा।";
+
+   document.getElementById("history").textContent=
+    "ग्राहक चुनने पर इतिहास दिखाई देगा।";
+
+   document.getElementById("expiry").value="";
+
    msg("बैकअप सफलतापूर्वक इम्पोर्ट हुआ।");
   }catch(e){
    msg("बैकअप फाइल सही नहीं है।",false);
   }
  };
+
  reader.readAsText(file);
 }
 
-renderExpiry();
+function init(){
+ const mobile=document.getElementById("mobile").value.trim();
+
+ if(validMobile(mobile) && customers[mobile]){
+  activeMobile=mobile;
+  render();
+ }
+}
+
 </script>
 </body>
 </html>
