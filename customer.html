@@ -1,1 +1,205 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DEV MEDICAL STORE Rewards</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f1f7f3;
+  margin: 0;
+  padding: 15px;
+  color: #222;
+}
+header {
+  background: #137547;
+  color: white;
+  padding: 20px 10px;
+  text-align: center;
+  border-radius: 12px;
+}
+.card {
+  background: white;
+  padding: 18px;
+  margin-top: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
+}
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  box-sizing: border-box;
+  font-size: 16px;
+  border-radius: 8px;
+}
+input { border: 1px solid #ccc; }
+button {
+  border: none;
+  background: #137547;
+  color: white;
+  font-weight: bold;
+}
+#dashboard { display: none; }
+.points {
+  font-size: 34px;
+  font-weight: bold;
+  color: #137547;
+}
+#message { white-space: pre-wrap; }
+.small { font-size: 13px; color: #555; }
+</style>
+</head>
+<body>
 
+<header>
+  <h2>DEV MEDICAL STORE</h2>
+  <p>Customer Rewards</p>
+</header>
+
+<section class="card" id="loginBox">
+  <h3>ग्राहक लॉगिन</h3>
+  <p class="small">अपना Customer ID और PIN डालें। OTP की जरूरत नहीं है।</p>
+
+  <input id="customerId" inputmode="numeric"
+         maxlength="10" placeholder="Customer ID">
+
+  <input id="pin" type="password" inputmode="numeric"
+         placeholder="PIN">
+
+  <button id="loginBtn">Login करें</button>
+  <p id="message"></p>
+</section>
+
+<section class="card" id="dashboard">
+  <h3 id="customerName">ग्राहक</h3>
+  <p>आपके उपलब्ध पॉइंट</p>
+  <div class="points" id="points">0</div>
+  <p>100 पॉइंट = ₹10</p>
+
+  <h3>पॉइंट की जानकारी</h3>
+  <div id="batches"></div>
+
+  <h3>लेन-देन की हिस्ट्री</h3>
+  <div id="history"></div>
+
+  <button id="logoutBtn">Logout</button>
+</section>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
+import { getAuth, signInWithEmailAndPassword, signOut }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+import { getFirestore, doc, getDoc }
+  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDSaB6azxPF0fXPmTaeXx_1MCWoeGIJPf0",
+  authDomain: "dev-medical-rewards.firebaseapp.com",
+  projectId: "dev-medical-rewards",
+  storageBucket: "dev-medical-rewards.firebasestorage.app",
+  messagingSenderId: "309364119063",
+  appId: "1:309364119063:web:9a110096720368b599ee52",
+  measurementId: "G-ZHY42CNC1W"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+
+$("loginBtn").addEventListener("click", async () => {
+  const customerId = $("customerId").value.trim();
+  const pin = $("pin").value.trim();
+
+  if (!/^\d{10}$/.test(customerId) || !pin) {
+    $("message").textContent =
+      "कृपया सही Customer ID और PIN डालें।";
+    return;
+  }
+
+  try {
+    // Customer ID को Firebase login email में बदला जाता है।
+    const email = customerId + "@devmedicalstore.in";
+
+    await signInWithEmailAndPassword(auth, email, pin);
+
+    const ref = doc(db, "customers", customerId);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      await signOut(auth);
+      throw new Error("CUSTOMER_NOT_FOUND");
+    }
+
+    const customer = snap.data();
+
+    // ग्राहक को केवल अपने रिकॉर्ड तक पहुँच मिलनी चाहिए।
+    if (customer.authUid !== auth.currentUser.uid) {
+      await signOut(auth);
+      throw new Error("ACCOUNT_NOT_LINKED");
+    }
+
+    const now = Date.now();
+    const lots = Array.isArray(customer.lots) ? customer.lots : [];
+
+    const available = lots
+      .filter(lot => !lot.expiry ||
+        new Date(lot.expiry).getTime() > now)
+      .reduce((sum, lot) => sum + Number(lot.points || 0), 0);
+
+    $("customerName").textContent =
+      "नमस्ते, " + (customer.name || "ग्राहक");
+
+    $("points").textContent = available;
+
+    $("batches").innerHTML = lots.length
+      ? lots.map(lot => {
+          const expired = lot.expiry &&
+            new Date(lot.expiry).getTime() <= now;
+
+          return `<p>${Number(lot.points || 0)} पॉइंट —
+            ${expired ? "एक्सपायर" :
+              (lot.expiry ? new Date(lot.expiry).toLocaleString("hi-IN")
+              : "कोई एक्सपायरी दर्ज नहीं")}</p>`;
+        }).join("")
+      : "<p>अभी कोई पॉइंट नहीं हैं।</p>";
+
+    const history = Array.isArray(customer.history)
+      ? customer.history.slice().reverse().slice(0, 20)
+      : [];
+
+    $("history").innerHTML = history.length
+      ? history.map(item =>
+          `<p>${item.type === "ADD" ? "पॉइंट जोड़े गए" :
+            item.type === "REDEEM" ? "पॉइंट रिडीम हुए" : "लेन-देन"}:
+            ${Number(item.points || 0)} पॉइंट</p>`
+        ).join("")
+      : "<p>अभी कोई लेन-देन नहीं है।</p>";
+
+    $("loginBox").style.display = "none";
+    $("dashboard").style.display = "block";
+
+  } catch (error) {
+    $("message").textContent =
+      error.message === "ACCOUNT_NOT_LINKED"
+        ? "इस ग्राहक खाते को अभी सही रिकॉर्ड से जोड़ा नहीं गया है।"
+        : error.message === "CUSTOMER_NOT_FOUND"
+        ? "ग्राहक का रिकॉर्ड नहीं मिला।"
+        : "लॉगिन नहीं हुआ। खाता, PIN और Firebase सुरक्षा नियम जाँचने होंगे।";
+  }
+});
+
+$("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  location.reload();
+});
+</script>
+
+</body>
+</html>
