@@ -6,69 +6,86 @@
 <title>DEV MEDICAL STORE Rewards</title>
 
 <style>
-body{
-font-family:Arial,sans-serif;
-background:#f1f7f3;
-margin:0;
-padding:15px;
-color:#222
+body {
+  font-family: Arial, sans-serif;
+  background: #f1f7f3;
+  margin: 0;
+  padding: 15px;
+  color: #222;
 }
-header{
-background:#137547;
-color:white;
-padding:20px 10px;
-text-align:center;
-border-radius:12px
+header {
+  background: #137547;
+  color: white;
+  padding: 20px 10px;
+  text-align: center;
+  border-radius: 12px;
 }
-.card{
-background:white;
-padding:18px;
-margin-top:16px;
-border-radius:12px;
-box-shadow:0 2px 8px #0001
+.card {
+  background: white;
+  padding: 18px;
+  margin-top: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
 }
-input,button{
-width:100%;
-padding:12px;
-margin-top:10px;
-box-sizing:border-box;
-font-size:16px;
-border-radius:8px
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  box-sizing: border-box;
+  font-size: 16px;
+  border-radius: 8px;
 }
-input{border:1px solid #ccc}
-button{
-border:0;
-background:#137547;
-color:white;
-font-weight:bold
+input {
+  border: 1px solid #ccc;
 }
-#dashboard{display:none}
-.points{
-font-size:34px;
-font-weight:bold;
-color:#137547
+button {
+  border: 0;
+  background: #137547;
+  color: white;
+  font-weight: bold;
 }
-#message{white-space:pre-wrap}
-.small{font-size:13px;color:#555}
-.profile-row{
-padding:9px 0;
-border-bottom:1px solid #eee;
-overflow-wrap:anywhere
+button:disabled {
+  opacity: .6;
 }
-.item{
-padding:10px;
-background:#f3f7f4;
-border-radius:8px;
-margin:8px 0
+#dashboard {
+  display: none;
 }
-#profilePhoto{
-width:120px;
-height:120px;
-border-radius:50%;
-object-fit:cover;
-border:3px solid #137547;
-display:block;
-margin:10px auto
+.points {
+  font-size: 34px;
+  font-weight: bold;
+  color: #137547;
+}
+#message, #photoMessage {
+  white-space: pre-wrap;
+}
+.small {
+  font-size: 13px;
+  color: #555;
+}
+.profile-row {
+  padding: 9px 0;
+  border-bottom: 1px solid #eee;
+  overflow-wrap: anywhere;
+}
+.item {
+  padding: 10px;
+  background: #f3f7f4;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+#profilePhoto {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #137547;
+  display: block;
+  margin: 10px auto;
+  background: #eee;
+}
+label {
+  display: block;
+  margin-top: 10px;
 }
 </style>
 </head>
@@ -76,402 +93,505 @@ margin:10px auto
 <body>
 
 <header>
-<h2>DEV MEDICAL STORE</h2>
-<p>Customer Rewards</p>
+  <h2>DEV MEDICAL STORE</h2>
+  <p>Customer Rewards</p>
 </header>
 
 <section class="card" id="loginBox">
-<h3>ग्राहक लॉगिन</h3>
-<p class="small">अपना Customer ID और PIN डालें। OTP की जरूरत नहीं है।</p>
-<input id="customerId" inputmode="numeric" maxlength="10"
-placeholder="Customer ID">
-<input id="pin" type="password" inputmode="numeric"
-placeholder="PIN">
-<button id="loginBtn">Login करें</button>
-<p id="message"></p>
+  <h3>ग्राहक लॉगिन</h3>
+  <p class="small">
+    अपना Customer ID और PIN डालें। OTP की जरूरत नहीं है।
+  </p>
+
+  <input
+    id="customerId"
+    inputmode="numeric"
+    maxlength="10"
+    placeholder="Customer ID">
+
+  <input
+    id="pin"
+    type="password"
+    inputmode="numeric"
+    placeholder="PIN">
+
+  <button id="loginBtn">Login करें</button>
+  <p id="message" role="status"></p>
 </section>
 
 <section class="card" id="dashboard">
 
-<h3 id="greeting">नमस्ते, ग्राहक</h3>
+  <h3 id="greeting">नमस्ते, ग्राहक</h3>
 
-<div class="card">
-<h3>👤 Customer Profile</h3>
+  <div class="card">
+    <h3>👤 Customer Profile</h3>
 
-<img id="profilePhoto"
-src="https://placehold.co/120x120?text=Photo"
-alt="Customer Profile Photo">
+    <img
+      id="profilePhoto"
+      src="https://placehold.co/120x120?text=Photo"
+      alt="Customer Profile Photo">
 
-<label for="photoFile">अपनी प्रोफाइल फोटो चुनें</label>
-<input id="photoFile" type="file" accept="image/*">
-<button id="uploadPhotoBtn">फोटो सेव करें</button>
-<p class="small" id="photoMessage">
-फोटो लगाने के लिए अपनी फोटो चुनें।
-</p>
+    <label for="photoFile">प्रोफाइल फोटो चुनें</label>
+    <input
+      id="photoFile"
+      type="file"
+      accept="image/*">
 
-<div class="profile-row">
-<b>Customer ID:</b> <span id="profileId">—</span>
-</div>
+    <button id="uploadPhotoBtn">फोटो सेव करें</button>
 
-<div class="profile-row">
-<b>नाम:</b> <span id="profileName">—</span>
-</div>
+    <p id="photoMessage" class="small">
+      अपनी फोटो चुनें और फोटो सेव करें दबाएँ।
+    </p>
 
-<div class="profile-row">
-<b>मोबाइल नंबर:</b> <span id="profileMobile">—</span>
-</div>
+    <div class="profile-row">
+      <b>Customer ID:</b>
+      <span id="profileId">—</span>
+    </div>
 
-<div class="profile-row">
-<b>जन्मतिथि:</b> <span id="profileDob">दर्ज नहीं</span>
-</div>
+    <div class="profile-row">
+      <b>नाम:</b>
+      <span id="profileName">—</span>
+    </div>
 
-<div class="profile-row">
-<b>अकाउंट बनने की तारीख:</b>
-<span id="profileCreated">दर्ज नहीं</span>
-</div>
+    <div class="profile-row">
+      <b>मोबाइल नंबर:</b>
+      <span id="profileMobile">—</span>
+    </div>
 
-<p class="small">
-जन्मतिथि बदलवाने के लिए DEV MEDICAL STORE से संपर्क करें।
-</p>
-</div>
+    <div class="profile-row">
+      <b>जन्मतिथि:</b>
+      <span id="profileDob">दर्ज नहीं</span>
+    </div>
 
-<div class="card">
-<h3>🎁 Rewards Dashboard</h3>
-<p>आपके उपलब्ध पॉइंट</p>
-<div class="points" id="points">0</div>
-<p>100 पॉइंट = ₹10</p>
-<p>अब तक जोड़े गए पॉइंट: <b id="totalAdded">0</b></p>
-<p>अब तक रिडीम किए गए पॉइंट: <b id="totalRedeemed">0</b></p>
-</div>
+    <div class="profile-row">
+      <b>अकाउंट बनने की तारीख:</b>
+      <span id="profileCreated">दर्ज नहीं</span>
+    </div>
 
-<div class="card">
-<h3>पॉइंट की जानकारी</h3>
-<div id="batches"></div>
-</div>
+    <p class="small">
+      जन्मतिथि बदलवाने के लिए DEV MEDICAL STORE से संपर्क करें।
+    </p>
 
-<div class="card">
-<h3>लेन-देन की हिस्ट्री</h3>
-<div id="history"></div>
-</div>
+    <p class="small">
+      फोटो इसी मोबाइल के ब्राउज़र में सेव होती है।
+      मोबाइल बदलने या ब्राउज़र का डेटा मिटाने पर फोटो खो सकती है।
+    </p>
+  </div>
 
-<button id="logoutBtn">Logout</button>
+  <div class="card">
+    <h3>🎁 Rewards Dashboard</h3>
+
+    <p>आपके उपलब्ध पॉइंट</p>
+    <div class="points" id="points">0</div>
+
+    <p>100 पॉइंट = ₹10</p>
+
+    <p>
+      अब तक जोड़े गए पॉइंट:
+      <b id="totalAdded">0</b>
+    </p>
+
+    <p>
+      अब तक रिडीम किए गए पॉइंट:
+      <b id="totalRedeemed">0</b>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>पॉइंट की जानकारी</h3>
+    <div id="batches"></div>
+  </div>
+
+  <div class="card">
+    <h3>लेन-देन की हिस्ट्री</h3>
+    <div id="history"></div>
+  </div>
+
+  <button id="logoutBtn">Logout</button>
 
 </section>
 
 <script type="module">
 
 import {
-initializeApp
+  initializeApp
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 
 import {
-getAuth,
-signInWithEmailAndPassword,
-signOut
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 import {
-getFirestore,
-doc,
-getDoc
+  getFirestore,
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-import {
-getStorage,
-ref,
-uploadBytes,
-getDownloadURL
-} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
-
 const firebaseConfig = {
-apiKey: "AIzaSyDSaB6azxPF0fXPmTaeXx_1MCWoeGIJPf0",
-authDomain: "dev-medical-rewards.firebaseapp.com",
-projectId: "dev-medical-rewards",
-storageBucket: "dev-medical-rewards.firebasestorage.app",
-messagingSenderId: "309364119063",
-appId: "1:309364119063:web:9a110096720368b599ee52",
-measurementId: "G-ZHY42CNC1W"
+  apiKey: "AIzaSyDSaB6azxPF0fXPmTaeXx_1MCWoeGIJPf0",
+  authDomain: "dev-medical-rewards.firebaseapp.com",
+  projectId: "dev-medical-rewards",
+  storageBucket: "dev-medical-rewards.firebasestorage.app",
+  messagingSenderId: "309364119063",
+  appId: "1:309364119063:web:9a110096720368b599ee52",
+  measurementId: "G-ZHY42CNC1W"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 const $ = id => document.getElementById(id);
 
 let currentCustomerId = "";
 
-function esc(v) {
-return String(v ?? "").replace(/[&<>"']/g, c => ({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#39;"
-}[c]));
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
 }
 
-function fmtDate(v) {
-if (!v) return "दर्ज नहीं";
+function fmtDate(value) {
+  if (!value) return "दर्ज नहीं";
 
-let d;
+  let d;
 
-if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
-const [y,m,day] = v.split("-").map(Number);
-d = new Date(y,m-1,day);
-} else {
-d = new Date(v);
+  // जन्मतिथि को स्थानीय तारीख के रूप में पढ़ें
+  if (
+    typeof value === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value)
+  ) {
+    const [year, month, day] = value.split("-").map(Number);
+    d = new Date(year, month - 1, day);
+  } else {
+    d = new Date(value);
+  }
+
+  return Number.isNaN(d.getTime())
+    ? "दर्ज नहीं"
+    : d.toLocaleDateString("hi-IN");
 }
 
-return Number.isNaN(d.getTime())
-? "दर्ज नहीं"
-: d.toLocaleDateString("hi-IN");
+function fmtDateTime(value) {
+  if (!value) return "दर्ज नहीं";
+
+  const d = new Date(value);
+
+  return Number.isNaN(d.getTime())
+    ? "दर्ज नहीं"
+    : d.toLocaleString("hi-IN");
 }
 
-function fmtDateTime(v) {
-if (!v) return "दर्ज नहीं";
-
-const d = new Date(v);
-
-return Number.isNaN(d.getTime())
-? "दर्ज नहीं"
-: d.toLocaleString("hi-IN");
+function photoKey() {
+  return "devmedical_photo_" + currentCustomerId;
 }
+
+function defaultPhoto() {
+  $("profilePhoto").src =
+    "https://placehold.co/120x120?text=Photo";
+}
+
+function loadProfilePhoto() {
+  try {
+    const photo = localStorage.getItem(photoKey());
+
+    if (photo) {
+      $("profilePhoto").src = photo;
+      $("photoMessage").textContent =
+        "आपकी प्रोफाइल फोटो लोड हो गई है।";
+    } else {
+      defaultPhoto();
+      $("photoMessage").textContent =
+        "अभी कोई फोटो सेव नहीं है।";
+    }
+  } catch (e) {
+    defaultPhoto();
+    $("photoMessage").textContent =
+      "फोटो लोड नहीं हो सकी।";
+  }
+}
+
+$("uploadPhotoBtn").addEventListener("click", async () => {
+  const file = $("photoFile").files[0];
+
+  if (!currentCustomerId || !auth.currentUser) {
+    $("photoMessage").textContent = "पहले लॉगिन करें।";
+    return;
+  }
+
+  if (!file || !file.type.startsWith("image/")) {
+    $("photoMessage").textContent =
+      "कृपया पहले अपनी फोटो चुनें।";
+    return;
+  }
+
+  if (file.size > 8 * 1024 * 1024) {
+    $("photoMessage").textContent =
+      "कृपया 8 MB से छोटी फोटो चुनें।";
+    return;
+  }
+
+  $("uploadPhotoBtn").disabled = true;
+  $("photoMessage").textContent = "फोटो सेव हो रही है...";
+
+  try {
+    const reader = new FileReader();
+
+    reader.onerror = () => {
+      $("photoMessage").textContent =
+        "फोटो पढ़ी नहीं जा सकी।";
+      $("uploadPhotoBtn").disabled = false;
+    };
+
+    reader.onload = () => {
+      const img = new Image();
+
+      img.onerror = () => {
+        $("photoMessage").textContent =
+          "यह फोटो खोली नहीं जा सकी। दूसरी फोटो चुनें।";
+        $("uploadPhotoBtn").disabled = false;
+      };
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          const maxSize = 350;
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > maxSize) {
+            height = Math.round(height * maxSize / width);
+            width = maxSize;
+          } else if (height > maxSize) {
+            width = Math.round(width * maxSize / height);
+            height = maxSize;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const context = canvas.getContext("2d");
+          context.drawImage(img, 0, 0, width, height);
+
+          const compressedPhoto =
+            canvas.toDataURL("image/jpeg", 0.65);
+
+          // फोटो केवल इस मोबाइल के ब्राउज़र में सेव होगी
+          localStorage.setItem(photoKey(), compressedPhoto);
+
+          $("profilePhoto").src = compressedPhoto;
+          $("photoMessage").textContent =
+            "फोटो सफलतापूर्वक इस मोबाइल में सेव हो गई।";
+
+        } catch (e) {
+          $("photoMessage").textContent =
+            "फोटो सेव नहीं हुई। मोबाइल की स्टोरेज खाली करें या छोटी फोटो चुनें।";
+        }
+
+        $("uploadPhotoBtn").disabled = false;
+      };
+
+      img.src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
+
+  } catch (e) {
+    $("photoMessage").textContent =
+      "फोटो सेव नहीं हो सकी।";
+    $("uploadPhotoBtn").disabled = false;
+  }
+});
 
 $("loginBtn").addEventListener("click", async () => {
+  const id = $("customerId").value.trim();
+  const pin = $("pin").value.trim();
 
-const id = $("customerId").value.trim();
-const pin = $("pin").value.trim();
+  if (!/^\d{10}$/.test(id) || !pin) {
+    $("message").textContent =
+      "कृपया सही 10 अंकों का Customer ID और PIN डालें।";
+    return;
+  }
 
-if (!/^\d{10}$/.test(id) || !pin) {
-$("message").textContent =
-"कृपया सही Customer ID और PIN डालें।";
-return;
-}
+  $("loginBtn").disabled = true;
+  $("message").textContent = "लॉगिन हो रहा है...";
 
-try {
+  try {
+    const email = id + "@devmedicalstore.in";
 
-$("message").textContent = "लॉगिन हो रहा है...";
+    const credential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      pin
+    );
 
-const email = id + "@devmedicalstore.in";
+    const snap = await getDoc(doc(db, "customers", id));
 
-await signInWithEmailAndPassword(auth,email,pin);
+    if (!snap.exists()) {
+      await signOut(auth);
+      throw Error("CUSTOMER_NOT_FOUND");
+    }
 
-const snap = await getDoc(doc(db,"customers",id));
+    const customer = snap.data();
 
-if (!snap.exists()) {
-await signOut(auth);
-throw Error("CUSTOMER_NOT_FOUND");
-}
+    if (customer.authUid !== credential.user.uid) {
+      await signOut(auth);
+      throw Error("ACCOUNT_NOT_LINKED");
+    }
 
-const c = snap.data();
+    currentCustomerId = id;
 
-if (c.authUid !== auth.currentUser.uid) {
-await signOut(auth);
-throw Error("ACCOUNT_NOT_LINKED");
-}
+    await renderCustomer(id, customer);
 
-currentCustomerId = id;
+    $("loginBox").style.display = "none";
+    $("dashboard").style.display = "block";
 
-await renderCustomer(id,c);
-
-$("loginBox").style.display = "none";
-$("dashboard").style.display = "block";
-
-} catch(e) {
-
-$("message").textContent =
-e.message === "CUSTOMER_NOT_FOUND"
-? "ग्राहक का रिकॉर्ड नहीं मिला।"
-: e.message === "ACCOUNT_NOT_LINKED"
-? "ग्राहक अकाउंट का रिकॉर्ड सही तरीके से लिंक नहीं है।"
-: "लॉगिन नहीं हुआ। Customer ID, PIN और Firebase सेटिंग जाँचें।";
-
-}
-
+  } catch (e) {
+    $("message").textContent =
+      e.message === "CUSTOMER_NOT_FOUND"
+        ? "ग्राहक का रिकॉर्ड नहीं मिला।"
+        : e.message === "ACCOUNT_NOT_LINKED"
+        ? "ग्राहक अकाउंट का रिकॉर्ड सही तरीके से लिंक नहीं है।"
+        : "लॉगिन नहीं हुआ। Customer ID, PIN और Firebase सेटिंग जाँचें।";
+  } finally {
+    $("loginBtn").disabled = false;
+  }
 });
 
-async function renderCustomer(id,c) {
+async function renderCustomer(id, customer) {
+  const lots = Array.isArray(customer.lots)
+    ? customer.lots
+    : [];
 
-const lots = Array.isArray(c.lots) ? c.lots : [];
-const history = Array.isArray(c.history) ? c.history : [];
-const now = Date.now();
+  const history = Array.isArray(customer.history)
+    ? customer.history
+    : [];
 
-const usable = lots.filter(l =>
-Number.isFinite(Date.parse(l.expiry)) &&
-Date.parse(l.expiry) > now &&
-Number(l.points) > 0
-);
+  const now = Date.now();
 
-const available = usable.reduce(
-(s,l) => s + Number(l.points || 0),0
-);
+  const usable = lots.filter(l =>
+    Number.isFinite(Date.parse(l.expiry)) &&
+    Date.parse(l.expiry) > now &&
+    Number(l.points) > 0
+  );
 
-const added = history
-.filter(h => h.type === "ADD")
-.reduce((s,h) => s + Number(h.points || 0),0);
+  const available = usable.reduce(
+    (sum, lot) => sum + Number(lot.points || 0),
+    0
+  );
 
-const redeemed = history
-.filter(h => h.type === "REDEEM")
-.reduce((s,h) => s + Number(h.points || 0),0);
+  const added = history
+    .filter(h => h.type === "ADD")
+    .reduce((sum, h) => sum + Number(h.points || 0), 0);
 
-$("greeting").textContent = "नमस्ते, " + (c.name || "ग्राहक");
-$("profileId").textContent = id;
-$("profileName").textContent = c.name || "दर्ज नहीं";
-$("profileMobile").textContent = c.mobile || id;
+  const redeemed = history
+    .filter(h => h.type === "REDEEM")
+    .reduce((sum, h) => sum + Number(h.points || 0), 0);
 
-$("profileDob").textContent =
-c.dateOfBirth ? fmtDate(c.dateOfBirth) : "दर्ज नहीं";
+  $("greeting").textContent =
+    "नमस्ते, " + (customer.name || "ग्राहक");
 
-/*
-पहले Firestore में सेव तारीख देखें।
-यदि वह उपलब्ध नहीं है, तो Firebase Authentication
-में अकाउंट बनने की तारीख दिखाएँ।
-*/
+  $("profileId").textContent = id;
+  $("profileName").textContent =
+    customer.name || "दर्ज नहीं";
 
-const authDate = auth.currentUser?.metadata?.creationTime;
-const createdDate = c.createdAt || authDate;
+  $("profileMobile").textContent =
+    customer.mobile || id;
 
-$("profileCreated").textContent =
-createdDate ? fmtDate(createdDate) : "दर्ज नहीं";
+  $("profileDob").textContent =
+    customer.dateOfBirth
+      ? fmtDate(customer.dateOfBirth)
+      : "दर्ज नहीं";
 
-$("points").textContent = available;
-$("totalAdded").textContent = added;
-$("totalRedeemed").textContent = redeemed;
+  /*
+    पहले ग्राहक रिकॉर्ड की createdAt तारीख दिखाएँ।
+    यदि वह नहीं है, तो Firebase Authentication की
+    creationTime तारीख इस्तेमाल करें।
+  */
+  const accountDate =
+    customer.createdAt ||
+    auth.currentUser?.metadata?.creationTime ||
+    "";
 
-$("batches").innerHTML = lots.length
-? lots.slice()
-.sort((a,b) => (Date.parse(a.expiry)||0)-(Date.parse(b.expiry)||0))
-.map(l => {
+  $("profileCreated").textContent =
+    accountDate ? fmtDate(accountDate) : "दर्ज नहीं";
 
-const expired =
-!l.expiry ||
-!Number.isFinite(Date.parse(l.expiry)) ||
-Date.parse(l.expiry) <= now;
+  $("points").textContent = available;
+  $("totalAdded").textContent = added;
+  $("totalRedeemed").textContent = redeemed;
 
-return '<div class="item"><b>' +
-esc(Number(l.points||0)) +
-' पॉइंट</b> — ' +
-(expired ? 'एक्सपायर/अमान्य' : esc(fmtDateTime(l.expiry))) +
-'</div>';
+  $("batches").innerHTML = lots.length
+    ? lots.slice()
+        .sort(
+          (a, b) =>
+            (Date.parse(a.expiry) || 0) -
+            (Date.parse(b.expiry) || 0)
+        )
+        .map(lot => {
+          const expired =
+            !lot.expiry ||
+            !Number.isFinite(Date.parse(lot.expiry)) ||
+            Date.parse(lot.expiry) <= now;
 
-}).join("")
-: "<p>अभी कोई पॉइंट नहीं हैं।</p>";
+          return `
+            <div class="item">
+              <b>${esc(Number(lot.points || 0))} पॉइंट</b>
+              —
+              ${expired
+                ? "एक्सपायर/अमान्य"
+                : esc(fmtDateTime(lot.expiry))}
+            </div>
+          `;
+        }).join("")
+    : "<p>अभी कोई पॉइंट नहीं हैं।</p>";
 
-$("history").innerHTML = history.length
-? history.slice().reverse().slice(0,50).map(h =>
+  $("history").innerHTML = history.length
+    ? history.slice().reverse().slice(0, 50).map(h => `
+        <div class="item">
+          <b>${
+            esc(
+              h.type === "ADD"
+                ? "पॉइंट जोड़े गए"
+                : h.type === "REDEEM"
+                ? "पॉइंट रिडीम हुए"
+                : "लेन-देन"
+            )
+          }</b>
+          <br>
+          पॉइंट: ${esc(Number(h.points || 0))}
+          ${
+            h.rupeeValue != null
+              ? "<br>छूट/राशि: ₹" + esc(h.rupeeValue)
+              : ""
+          }
+          ${h.note ? "<br>" + esc(h.note) : ""}
+          ${
+            h.expiry
+              ? "<br>एक्सपायरी: " + esc(fmtDateTime(h.expiry))
+              : ""
+          }
+          <br>
+          <span class="small">${esc(fmtDateTime(h.date))}</span>
+        </div>
+      `).join("")
+    : "<p>अभी कोई लेन-देन नहीं है।</p>";
 
-'<div class="item"><b>' +
-esc(
-h.type === "ADD" ? "पॉइंट जोड़े गए" :
-h.type === "REDEEM" ? "पॉइंट रिडीम हुए" :
-"लेन-देन"
-) +
-'</b><br>पॉइंट: ' + esc(Number(h.points||0)) +
-(h.rupeeValue != null
-? '<br>छूट/राशि: ₹' + esc(h.rupeeValue)
-: '') +
-(h.note ? '<br>' + esc(h.note) : '') +
-(h.expiry ? '<br>एक्सपायरी: ' + esc(fmtDateTime(h.expiry)) : '') +
-'<br><span class="small">' + esc(fmtDateTime(h.date)) +
-'</span></div>'
-
-).join("")
-: "<p>अभी कोई लेन-देन नहीं है।</p>";
-
-await loadProfilePhoto();
-
+  loadProfilePhoto();
 }
 
-async function loadProfilePhoto() {
-
-if (!auth.currentUser) return;
-
-try {
-
-const photoRef = ref(
-storage,
-"customerPhotos/" + auth.currentUser.uid + "/profile.jpg"
-);
-
-const url = await getDownloadURL(photoRef);
-
-$("profilePhoto").src = url;
-$("photoMessage").textContent = "प्रोफाइल फोटो लोड हो गई है।";
-
-} catch(e) {
-
-$("profilePhoto").src =
-"https://placehold.co/120x120?text=Photo";
-
-$("photoMessage").textContent =
-"अभी कोई प्रोफाइल फोटो सेव नहीं है।";
-
-}
-
-}
-
-$("uploadPhotoBtn").addEventListener("click",async() => {
-
-const file = $("photoFile").files[0];
-
-if (!auth.currentUser || !currentCustomerId) {
-$("photoMessage").textContent = "पहले लॉगिन करें।";
-return;
-}
-
-if (!file) {
-$("photoMessage").textContent = "पहले अपनी फोटो चुनें।";
-return;
-}
-
-if (!file.type.startsWith("image/")) {
-$("photoMessage").textContent = "कृपया फोटो वाली फाइल चुनें।";
-return;
-}
-
-if (file.size > 3 * 1024 * 1024) {
-$("photoMessage").textContent =
-"फोटो का आकार 3 MB से कम रखें।";
-return;
-}
-
-try {
-
-$("photoMessage").textContent = "फोटो सेव हो रही है...";
-
-const photoRef = ref(
-storage,
-"customerPhotos/" + auth.currentUser.uid + "/profile.jpg"
-);
-
-await uploadBytes(photoRef,file,{
-contentType:file.type
-});
-
-const url = await getDownloadURL(photoRef);
-
-$("profilePhoto").src = url;
-$("photoMessage").textContent = "आपकी फोटो सफलतापूर्वक सेव हो गई।";
-
-} catch(e) {
-
-$("photoMessage").textContent =
-"फोटो सेव नहीं हुई। Firebase Storage चालू है और उसके Rules सही हैं, यह जाँचें।";
-
-console.error(e);
-
-}
-
-});
-
-$("logoutBtn").addEventListener("click",async() => {
-await signOut(auth);
-location.reload();
+$("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  currentCustomerId = "";
+  location.reload();
 });
 
 </script>
-
 </body>
 </html>
