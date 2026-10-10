@@ -5,199 +5,215 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DEV MEDICAL STORE Rewards</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f1f7f3;
-  margin: 0;
-  padding: 15px;
-  color: #222;
-}
-header {
-  background: #137547;
-  color: white;
-  padding: 20px 10px;
-  text-align: center;
-  border-radius: 12px;
-}
-.card {
-  background: white;
-  padding: 18px;
-  margin-top: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0001;
-}
-input, button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  box-sizing: border-box;
-  font-size: 16px;
-  border-radius: 8px;
-}
-input { border: 1px solid #ccc; }
-button {
-  border: none;
-  background: #137547;
-  color: white;
-  font-weight: bold;
-}
-#dashboard { display: none; }
-.points {
-  font-size: 34px;
-  font-weight: bold;
-  color: #137547;
-}
-#message { white-space: pre-wrap; }
-.small { font-size: 13px; color: #555; }
+body{font-family:Arial,sans-serif;background:#f1f7f3;margin:0;padding:15px;color:#222}
+header{background:#137547;color:#fff;padding:20px 10px;text-align:center;border-radius:12px}
+.card{background:#fff;padding:18px;margin-top:16px;border-radius:12px;box-shadow:0 2px 8px #0001}
+input,button{width:100%;padding:12px;margin-top:10px;box-sizing:border-box;font-size:16px;border-radius:8px}
+input{border:1px solid #ccc}
+button{border:0;background:#137547;color:#fff;font-weight:bold}
+#dashboard{display:none}
+.points{font-size:34px;font-weight:bold;color:#137547}
+#message{white-space:pre-wrap}
+.small{font-size:13px;color:#555}
+.profile-row{padding:9px 0;border-bottom:1px solid #eee;overflow-wrap:anywhere}
+.profile-row:last-child{border-bottom:0}
+.item{padding:10px;background:#f3f7f4;border-radius:8px;margin:8px 0}
 </style>
 </head>
 <body>
 
 <header>
-  <h2>DEV MEDICAL STORE</h2>
-  <p>Customer Rewards</p>
+<h2>DEV MEDICAL STORE</h2>
+<p>Customer Rewards</p>
 </header>
 
 <section class="card" id="loginBox">
-  <h3>ग्राहक लॉगिन</h3>
-  <p class="small">अपना Customer ID और PIN डालें। OTP की जरूरत नहीं है।</p>
-
-  <input id="customerId" inputmode="numeric"
-         maxlength="10" placeholder="Customer ID">
-
-  <input id="pin" type="password" inputmode="numeric"
-         placeholder="PIN">
-
-  <button id="loginBtn">Login करें</button>
-  <p id="message"></p>
+<h3>ग्राहक लॉगिन</h3>
+<p class="small">अपना Customer ID और PIN डालें। OTP की जरूरत नहीं है।</p>
+<input id="customerId" inputmode="numeric" maxlength="10" placeholder="Customer ID">
+<input id="pin" type="password" inputmode="numeric" placeholder="PIN">
+<button id="loginBtn">Login करें</button>
+<p id="message"></p>
 </section>
 
 <section class="card" id="dashboard">
-  <h3 id="customerName">ग्राहक</h3>
-  <p>आपके उपलब्ध पॉइंट</p>
-  <div class="points" id="points">0</div>
-  <p>100 पॉइंट = ₹10</p>
+<h3 id="greeting">नमस्ते, ग्राहक</h3>
 
-  <h3>पॉइंट की जानकारी</h3>
-  <div id="batches"></div>
+<div class="card">
+<h3>👤 Customer Profile</h3>
+<div class="profile-row"><b>Customer ID:</b> <span id="profileId">—</span></div>
+<div class="profile-row"><b>नाम:</b> <span id="profileName">—</span></div>
+<div class="profile-row"><b>मोबाइल नंबर:</b> <span id="profileMobile">—</span></div>
+<div class="profile-row"><b>जन्मतिथि:</b> <span id="profileDob">दर्ज नहीं</span></div>
+<div class="profile-row"><b>अकाउंट बनने की तारीख:</b> <span id="profileCreated">दर्ज नहीं</span></div>
+<p class="small">जन्मतिथि वैकल्पिक है। इसे बदलवाने के लिए DEV MEDICAL STORE से संपर्क करें।</p>
+</div>
 
-  <h3>लेन-देन की हिस्ट्री</h3>
-  <div id="history"></div>
+<div class="card">
+<h3>🎁 Rewards Dashboard</h3>
+<p>आपके उपलब्ध पॉइंट</p>
+<div class="points" id="points">0</div>
+<p>100 पॉइंट = ₹10</p>
+<p>अब तक जोड़े गए पॉइंट: <b id="totalAdded">0</b></p>
+<p>अब तक रिडीम किए गए पॉइंट: <b id="totalRedeemed">0</b></p>
+</div>
 
-  <button id="logoutBtn">Logout</button>
+<div class="card">
+<h3>पॉइंट की जानकारी</h3>
+<div id="batches"></div>
+</div>
+
+<div class="card">
+<h3>लेन-देन की हिस्ट्री</h3>
+<div id="history"></div>
+</div>
+
+<button id="logoutBtn">Logout</button>
 </section>
 
 <script type="module">
-import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {getAuth,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import {getFirestore,doc,getDoc} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-import { getAuth, signInWithEmailAndPassword, signOut }
-  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-
-import { getFirestore, doc, getDoc }
-  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDSaB6azxPF0fXPmTaeXx_1MCWoeGIJPf0",
-  authDomain: "dev-medical-rewards.firebaseapp.com",
-  projectId: "dev-medical-rewards",
-  storageBucket: "dev-medical-rewards.firebasestorage.app",
-  messagingSenderId: "309364119063",
-  appId: "1:309364119063:web:9a110096720368b599ee52",
-  measurementId: "G-ZHY42CNC1W"
+const firebaseConfig={
+apiKey:"AIzaSyDSaB6azxPF0fXPmTaeXx_1MCWoeGIJPf0",
+authDomain:"dev-medical-rewards.firebaseapp.com",
+projectId:"dev-medical-rewards",
+storageBucket:"dev-medical-rewards.firebasestorage.app",
+messagingSenderId:"309364119063",
+appId:"1:309364119063:web:9a110096720368b599ee52",
+measurementId:"G-ZHY42CNC1W"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const $=id=>document.getElementById(id);
 
-const $ = id => document.getElementById(id);
+function esc(v){
+return String(v??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
 
-$("loginBtn").addEventListener("click", async () => {
-  const customerId = $("customerId").value.trim();
-  const pin = $("pin").value.trim();
+function fmtDate(v){
+if(!v)return "दर्ज नहीं";
+let d=new Date(v);
+return Number.isNaN(d.getTime())?"दर्ज नहीं":d.toLocaleDateString("hi-IN");
+}
 
-  if (!/^\d{10}$/.test(customerId) || !pin) {
-    $("message").textContent =
-      "कृपया सही Customer ID और PIN डालें।";
-    return;
-  }
+function fmtDateTime(v){
+if(!v)return "दर्ज नहीं";
+let d=new Date(v);
+return Number.isNaN(d.getTime())?"दर्ज नहीं":d.toLocaleString("hi-IN");
+}
 
-  try {
-    // Customer ID को Firebase login email में बदला जाता है।
-    const email = customerId + "@devmedicalstore.in";
+$("loginBtn").addEventListener("click",async()=>{
+let id=$("customerId").value.trim();
+let pin=$("pin").value.trim();
 
-    await signInWithEmailAndPassword(auth, email, pin);
+if(!/^\d{10}$/.test(id)||!pin){
+$("message").textContent="कृपया सही Customer ID और PIN डालें।";
+return;
+}
 
-    const ref = doc(db, "customers", customerId);
-    const snap = await getDoc(ref);
+try{
+let email=id+"@devmedicalstore.in";
+await signInWithEmailAndPassword(auth,email,pin);
 
-    if (!snap.exists()) {
-      await signOut(auth);
-      throw new Error("CUSTOMER_NOT_FOUND");
-    }
+let snap=await getDoc(doc(db,"customers",id));
 
-    const customer = snap.data();
+if(!snap.exists()){
+await signOut(auth);
+throw Error("CUSTOMER_NOT_FOUND");
+}
 
-    // ग्राहक को केवल अपने रिकॉर्ड तक पहुँच मिलनी चाहिए।
-    if (customer.authUid !== auth.currentUser.uid) {
-      await signOut(auth);
-      throw new Error("ACCOUNT_NOT_LINKED");
-    }
+let c=snap.data();
 
-    const now = Date.now();
-    const lots = Array.isArray(customer.lots) ? customer.lots : [];
+if(c.authUid!==auth.currentUser.uid){
+await signOut(auth);
+throw Error("ACCOUNT_NOT_LINKED");
+}
 
-    const available = lots
-      .filter(lot => !lot.expiry ||
-        new Date(lot.expiry).getTime() > now)
-      .reduce((sum, lot) => sum + Number(lot.points || 0), 0);
+renderCustomer(id,c);
+$("loginBox").style.display="none";
+$("dashboard").style.display="block";
 
-    $("customerName").textContent =
-      "नमस्ते, " + (customer.name || "ग्राहक");
-
-    $("points").textContent = available;
-
-    $("batches").innerHTML = lots.length
-      ? lots.map(lot => {
-          const expired = lot.expiry &&
-            new Date(lot.expiry).getTime() <= now;
-
-          return `<p>${Number(lot.points || 0)} पॉइंट —
-            ${expired ? "एक्सपायर" :
-              (lot.expiry ? new Date(lot.expiry).toLocaleString("hi-IN")
-              : "कोई एक्सपायरी दर्ज नहीं")}</p>`;
-        }).join("")
-      : "<p>अभी कोई पॉइंट नहीं हैं।</p>";
-
-    const history = Array.isArray(customer.history)
-      ? customer.history.slice().reverse().slice(0, 20)
-      : [];
-
-    $("history").innerHTML = history.length
-      ? history.map(item =>
-          `<p>${item.type === "ADD" ? "पॉइंट जोड़े गए" :
-            item.type === "REDEEM" ? "पॉइंट रिडीम हुए" : "लेन-देन"}:
-            ${Number(item.points || 0)} पॉइंट</p>`
-        ).join("")
-      : "<p>अभी कोई लेन-देन नहीं है।</p>";
-
-    $("loginBox").style.display = "none";
-    $("dashboard").style.display = "block";
-
-  } catch (error) {
-    $("message").textContent =
-      error.message === "ACCOUNT_NOT_LINKED"
-        ? "इस ग्राहक खाते को अभी सही रिकॉर्ड से जोड़ा नहीं गया है।"
-        : error.message === "CUSTOMER_NOT_FOUND"
-        ? "ग्राहक का रिकॉर्ड नहीं मिला।"
-        : "लॉगिन नहीं हुआ। खाता, PIN और Firebase सुरक्षा नियम जाँचने होंगे।";
-  }
+}catch(e){
+$("message").textContent=
+e.message==="ACCOUNT_NOT_LINKED"
+?"इस ग्राहक खाते को अभी सही रिकॉर्ड से नहीं जोड़ा गया है।":
+e.message==="CUSTOMER_NOT_FOUND"
+?"ग्राहक का रिकॉर्ड नहीं मिला।":
+"लॉगिन नहीं हुआ। Customer ID, PIN और Firebase सुरक्षा नियम जाँचें।";
+}
 });
 
-$("logoutBtn").addEventListener("click", async () => {
-  await signOut(auth);
-  location.reload();
+function renderCustomer(id,c){
+
+let lots=Array.isArray(c.lots)?c.lots:[];
+let history=Array.isArray(c.history)?c.history:[];
+let now=Date.now();
+
+let usable=lots.filter(l=>
+Number.isFinite(Date.parse(l.expiry))&&
+Date.parse(l.expiry)>now&&
+Number(l.points)>0
+);
+
+let available=usable.reduce((s,l)=>s+Number(l.points||0),0);
+
+let added=history
+.filter(h=>h.type==="ADD")
+.reduce((s,h)=>s+Number(h.points||0),0);
+
+let redeemed=history
+.filter(h=>h.type==="REDEEM")
+.reduce((s,h)=>s+Number(h.points||0),0);
+
+$("greeting").textContent="नमस्ते, "+(c.name||"ग्राहक");
+$("profileId").textContent=id;
+$("profileName").textContent=c.name||"दर्ज नहीं";
+$("profileMobile").textContent=c.mobile||id;
+$("profileDob").textContent=c.dateOfBirth?fmtDate(c.dateOfBirth):"दर्ज नहीं";
+$("profileCreated").textContent=fmtDate(c.createdAt);
+$("points").textContent=available;
+$("totalAdded").textContent=added;
+$("totalRedeemed").textContent=redeemed;
+
+$("batches").innerHTML=lots.length?
+lots.slice().sort((a,b)=>(Date.parse(a.expiry)||0)-(Date.parse(b.expiry)||0))
+.map(l=>{
+let expired=!l.expiry||
+!Number.isFinite(Date.parse(l.expiry))||
+Date.parse(l.expiry)<=now;
+
+return '<div class="item"><b>'+
+esc(Number(l.points||0))+
+' पॉइंट</b> — '+
+(expired?'<span>एक्सपायर/अमान्य</span>':esc(fmtDateTime(l.expiry)))+
+'</div>';
+}).join("")
+:"<p>अभी कोई पॉइंट नहीं हैं।</p>";
+
+$("history").innerHTML=history.length?
+history.slice().reverse().slice(0,50).map(h=>
+'<div class="item"><b>'+
+esc(h.type==="ADD"?"पॉइंट जोड़े गए":h.type==="REDEEM"?"पॉइंट रिडीम हुए":"लेन-देन")+
+'</b><br>पॉइंट: '+
+esc(Number(h.points||0))+
+(h.rupeeValue!=null?'<br>छूट/राशि: ₹'+esc(h.rupeeValue):'')+
+(h.note?'<br>'+esc(h.note):'')+
+(h.expiry?'<br>एक्सपायरी: '+esc(fmtDateTime(h.expiry)):'')+
+'<br><span class="small">'+esc(fmtDateTime(h.date))+'</span></div>'
+).join("")
+:"<p>अभी कोई लेन-देन नहीं है।</p>";
+}
+
+$("logoutBtn").addEventListener("click",async()=>{
+await signOut(auth);
+location.reload();
 });
 </script>
 
