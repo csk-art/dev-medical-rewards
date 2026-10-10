@@ -58,8 +58,23 @@ label{display:block;margin-top:8px}
 <input id="newMobile" inputmode="numeric" maxlength="10" placeholder="10 अंकों वाला मोबाइल नंबर">
 <label for="newDob">जन्मतिथि (वैकल्पिक)</label>
 <input id="newDob" type="date">
-<button id="createCustomerBtn">ग्राहक सेव करें</button>
-<p class="small">नया रिकॉर्ड बनाने के बाद ग्राहक का लॉगिन अकाउंट अलग से बनाना होगा।</p>
+
+<label for="newPin">ग्राहक का 6 अंकों का PIN</label>
+<input
+  id="newPin"
+  type="password"
+  inputmode="numeric"
+  maxlength="6"
+  pattern="[0-9]{6}"
+  autocomplete="new-password"
+  placeholder="6 अंकों का PIN">
+
+<button id="createCustomerBtn">ग्राहक और लॉगिन बनाएँ</button>
+
+<p class="small">
+  ग्राहक के लिए 6 अंकों का PIN बनाएँ और उसे सुरक्षित तरीके से बताएँ।
+  PIN किसी दूसरे व्यक्ति के साथ साझा न करें।
+</p>
 </div>
 
 <div id="customerActions" class="hidden">
