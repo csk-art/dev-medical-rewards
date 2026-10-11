@@ -1,0 +1,10 @@
+{
+  "name": "DEV MEDICAL STORE Rewards Admin",
+  "short_name": "DEV Rewards",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0f766e",
+  "description": "Offline customer and reward point management"
+}
